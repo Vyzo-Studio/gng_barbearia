@@ -1,0 +1,24 @@
+GNG BARBEARIA — SITE V3
+
+Arquivos:
+- index.html
+- style.css
+- script.js
+- assets/gng-corte-01.png
+- assets/gng-corte-02.png
+
+O site já inclui:
+- WhatsApp: (61) 99407-5539
+- Endereço: St. M QNM 21 conjunto D lote 48 - Ceilândia, Brasília - DF, 72215-214
+- Link do Google Maps: https://maps.app.goo.gl/TWPYmZSicCJ618xw6
+- Tabela completa de serviços e valores
+- GNG Select: R$ 85/mês
+- GNG Elite: R$ 150/mês
+- Layout responsivo e acessível
+- Menu mobile
+- Botão fixo de agendamento no celular
+- Fotos enviadas nesta conversa como exemplos
+
+Para publicar:
+Substitua index.html, style.css e script.js na raiz do repositório.
+Crie a pasta assets e envie as duas imagens PNG dela.
