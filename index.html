@@ -15,7 +15,7 @@
 
   <meta
     name="description"
-    content="GNG Barbearia em Ceilândia. Cortes, barba, cuidados masculinos e assinaturas mensais. Consulte valores e agende pelo WhatsApp."
+    content="GNG Barbearia em Ceilândia. Cortes, barba, cuidados masculinos, assinaturas e agendamento online."
   >
 
   <title>GNG Barbearia | Ceilândia</title>
@@ -49,7 +49,7 @@
 
   <link
     rel="stylesheet"
-    href="style.css?v=5.0"
+    href="style.css?v=6.0"
   >
 </head>
 
@@ -105,6 +105,10 @@
           Valores
         </a>
 
+        <a href="#agendamento">
+          Agendamento
+        </a>
+
         <a href="#portfolio">
           Cortes
         </a>
@@ -123,9 +127,7 @@
 
         <a
           class="nav-cta"
-          href="https://wa.me/5561994075539?text=Ol%C3%A1%2C%20GNG%20Barbearia%21%20Vim%20pelo%20site%20e%20quero%20agendar%20um%20hor%C3%A1rio."
-          target="_blank"
-          rel="noopener noreferrer"
+          href="#agendamento"
         >
           Agendar
         </a>
@@ -156,18 +158,16 @@
           <p class="hero-lead">
             Corte, barba e cuidados masculinos com atendimento
             profissional, valores claros e agendamento direto
-            pelo WhatsApp.
+            pelo site.
           </p>
 
           <div class="hero-actions">
 
             <a
               class="btn btn-primary"
-              href="https://wa.me/5561994075539?text=Ol%C3%A1%2C%20GNG%20Barbearia%21%20Vim%20pelo%20site%20e%20quero%20agendar%20um%20hor%C3%A1rio."
-              target="_blank"
-              rel="noopener noreferrer"
+              href="#agendamento"
             >
-              Agendar pelo WhatsApp
+              Agendar horário
             </a>
 
             <a
@@ -211,11 +211,11 @@
             <div>
 
               <span>
-                ATENDIMENTO
+                HORÁRIOS
               </span>
 
               <strong>
-                Consulte horários pelo WhatsApp
+                Todos os dias • 09:00 às 19:30
               </strong>
 
             </div>
@@ -280,8 +280,8 @@
 
         <div>
           <span>02</span>
-          <strong>Agendamento rápido</strong>
-          <small>Direto pelo WhatsApp</small>
+          <strong>Agendamento online</strong>
+          <small>Escolha dia e horário</small>
         </div>
 
         <div>
@@ -292,8 +292,8 @@
 
         <div>
           <span>04</span>
-          <strong>Localização fácil</strong>
-          <small>Abra a rota no celular</small>
+          <strong>Todos os dias</strong>
+          <small>09:00 às 19:30</small>
         </div>
 
       </div>
@@ -352,58 +352,135 @@
               <tr>
                 <td data-label="Serviço">Barba</td>
                 <td data-label="Duração">20 min</td>
-                <td data-label="Valor"><strong>R$ 25,00</strong></td>
+                <td data-label="Valor">
+                  <strong>R$ 25,00</strong>
+                </td>
                 <td class="table-action">
-                  <a href="https://wa.me/5561994075539?text=Ol%C3%A1%2C%20quero%20agendar%20Barba." target="_blank" rel="noopener noreferrer">Agendar</a>
+                  <a
+                    href="#agendamento"
+                    data-service-link="Barba"
+                  >
+                    Agendar
+                  </a>
                 </td>
               </tr>
 
               <tr>
                 <td data-label="Serviço">Corte</td>
                 <td data-label="Duração">20 min</td>
-                <td data-label="Valor"><strong>R$ 30,00</strong></td>
+                <td data-label="Valor">
+                  <strong>R$ 30,00</strong>
+                </td>
                 <td class="table-action">
-                  <a href="https://wa.me/5561994075539?text=Ol%C3%A1%2C%20quero%20agendar%20Corte." target="_blank" rel="noopener noreferrer">Agendar</a>
+                  <a
+                    href="#agendamento"
+                    data-service-link="Corte"
+                  >
+                    Agendar
+                  </a>
                 </td>
               </tr>
 
               <tr>
-                <td data-label="Serviço">Corte + Barba</td>
-                <td data-label="Duração">40 min</td>
-                <td data-label="Valor"><strong>R$ 55,00</strong></td>
+                <td data-label="Serviço">
+                  Corte + Barba
+                </td>
+
+                <td data-label="Duração">
+                  40 min
+                </td>
+
+                <td data-label="Valor">
+                  <strong>R$ 55,00</strong>
+                </td>
+
                 <td class="table-action">
-                  <a href="https://wa.me/5561994075539?text=Ol%C3%A1%2C%20quero%20agendar%20Corte%20%2B%20Barba." target="_blank" rel="noopener noreferrer">Agendar</a>
+                  <a
+                    href="#agendamento"
+                    data-service-link="Corte + Barba"
+                  >
+                    Agendar
+                  </a>
                 </td>
               </tr>
 
               <tr>
-                <td data-label="Serviço">Corte + Graxa</td>
-                <td data-label="Duração">40 min</td>
-                <td data-label="Valor"><strong>R$ 50,00</strong></td>
-                <td class="table-action">
-                  <a href="https://wa.me/5561994075539?text=Ol%C3%A1%2C%20quero%20agendar%20Corte%20%2B%20Graxa." target="_blank" rel="noopener noreferrer">Agendar</a>
+
+                <td data-label="Serviço">
+                  Corte + Graxa
                 </td>
+
+                <td data-label="Duração">
+                  40 min
+                </td>
+
+                <td data-label="Valor">
+                  <strong>R$ 50,00</strong>
+                </td>
+
+                <td class="table-action">
+                  <a
+                    href="#agendamento"
+                    data-service-link="Corte + Graxa"
+                  >
+                    Agendar
+                  </a>
+                </td>
+
               </tr>
 
               <tr>
-                <td data-label="Serviço">Corte + Hidratação</td>
-                <td data-label="Duração">20 min</td>
-                <td data-label="Valor"><strong>R$ 45,00</strong></td>
-                <td class="table-action">
-                  <a href="https://wa.me/5561994075539?text=Ol%C3%A1%2C%20quero%20agendar%20Corte%20%2B%20Hidrata%C3%A7%C3%A3o." target="_blank" rel="noopener noreferrer">Agendar</a>
+
+                <td data-label="Serviço">
+                  Corte + Hidratação
                 </td>
+
+                <td data-label="Duração">
+                  20 min
+                </td>
+
+                <td data-label="Valor">
+                  <strong>R$ 45,00</strong>
+                </td>
+
+                <td class="table-action">
+                  <a
+                    href="#agendamento"
+                    data-service-link="Corte + Hidratação"
+                  >
+                    Agendar
+                  </a>
+                </td>
+
               </tr>
 
               <tr>
-                <td data-label="Serviço">Corte + Sobrancelha</td>
-                <td data-label="Duração">20 min</td>
-                <td data-label="Valor"><strong>R$ 40,00</strong></td>
-                <td class="table-action">
-                  <a href="https://wa.me/5561994075539?text=Ol%C3%A1%2C%20quero%20agendar%20Corte%20%2B%20Sobrancelha." target="_blank" rel="noopener noreferrer">Agendar</a>
+
+                <td data-label="Serviço">
+                  Corte + Sobrancelha
                 </td>
+
+                <td data-label="Duração">
+                  20 min
+                </td>
+
+                <td data-label="Valor">
+                  <strong>R$ 40,00</strong>
+                </td>
+
+                <td class="table-action">
+                  <a
+                    href="#agendamento"
+                    data-service-link="Corte + Sobrancelha"
+                  >
+                    Agendar
+                  </a>
+                </td>
+
               </tr>
 
               <tr>
+
                 <td data-label="Serviço">
                   Corte + Barba + Sobrancelha
                 </td>
@@ -417,8 +494,14 @@
                 </td>
 
                 <td class="table-action">
-                  <a href="https://wa.me/5561994075539?text=Ol%C3%A1%2C%20quero%20agendar%20Corte%20%2B%20Barba%20%2B%20Sobrancelha." target="_blank" rel="noopener noreferrer">Agendar</a>
+                  <a
+                    href="#agendamento"
+                    data-service-link="Corte + Barba + Sobrancelha"
+                  >
+                    Agendar
+                  </a>
                 </td>
+
               </tr>
 
               <tr>
@@ -436,12 +519,18 @@
                 </td>
 
                 <td class="table-action">
-                  <a href="https://wa.me/5561994075539?text=Ol%C3%A1%2C%20quero%20agendar%20Corte%20%2B%20Barba%20%2B%20Sobrancelha%20%2B%20Limpeza%20de%20Pele." target="_blank" rel="noopener noreferrer">Agendar</a>
+                  <a
+                    href="#agendamento"
+                    data-service-link="Corte + Barba + Sobrancelha + Limpeza de Pele"
+                  >
+                    Agendar
+                  </a>
                 </td>
 
               </tr>
 
               <tr>
+
                 <td data-label="Serviço">
                   Corte + Bigode
                 </td>
@@ -455,8 +544,14 @@
                 </td>
 
                 <td class="table-action">
-                  <a href="https://wa.me/5561994075539?text=Ol%C3%A1%2C%20quero%20agendar%20Corte%20%2B%20Bigode." target="_blank" rel="noopener noreferrer">Agendar</a>
+                  <a
+                    href="#agendamento"
+                    data-service-link="Corte + Bigode"
+                  >
+                    Agendar
+                  </a>
                 </td>
+
               </tr>
 
               <tr>
@@ -474,7 +569,12 @@
                 </td>
 
                 <td class="table-action">
-                  <a href="https://wa.me/5561994075539?text=Ol%C3%A1%2C%20quero%20agendar%20Corte%20%2B%20Bigode%20%2B%20Sobrancelha." target="_blank" rel="noopener noreferrer">Agendar</a>
+                  <a
+                    href="#agendamento"
+                    data-service-link="Corte + Bigode + Sobrancelha"
+                  >
+                    Agendar
+                  </a>
                 </td>
 
               </tr>
@@ -494,7 +594,12 @@
                 </td>
 
                 <td class="table-action">
-                  <a href="https://wa.me/5561994075539?text=Ol%C3%A1%2C%20quero%20agendar%20Corte%20%2B%20Sobrancelha%20%2B%20Limpeza%20de%20Pele." target="_blank" rel="noopener noreferrer">Agendar</a>
+                  <a
+                    href="#agendamento"
+                    data-service-link="Corte + Sobrancelha + Limpeza de Pele"
+                  >
+                    Agendar
+                  </a>
                 </td>
 
               </tr>
@@ -514,7 +619,12 @@
                 </td>
 
                 <td class="table-action">
-                  <a href="https://wa.me/5561994075539?text=Ol%C3%A1%2C%20quero%20agendar%20Graxa." target="_blank" rel="noopener noreferrer">Agendar</a>
+                  <a
+                    href="#agendamento"
+                    data-service-link="Graxa"
+                  >
+                    Agendar
+                  </a>
                 </td>
 
               </tr>
@@ -534,7 +644,12 @@
                 </td>
 
                 <td class="table-action">
-                  <a href="https://wa.me/5561994075539?text=Ol%C3%A1%2C%20quero%20agendar%20Limpeza%20de%20Pele." target="_blank" rel="noopener noreferrer">Agendar</a>
+                  <a
+                    href="#agendamento"
+                    data-service-link="Limpeza de Pele"
+                  >
+                    Agendar
+                  </a>
                 </td>
 
               </tr>
@@ -542,6 +657,335 @@
             </tbody>
 
           </table>
+
+        </div>
+
+      </div>
+
+    </section>
+
+    <section
+      class="section booking-section"
+      id="agendamento"
+    >
+
+      <div class="container">
+
+        <div class="section-head booking-heading">
+
+          <div>
+
+            <p class="eyebrow">
+              AGENDE SEU HORÁRIO
+            </p>
+
+            <h2>
+              Escolha seu atendimento
+            </h2>
+
+          </div>
+
+          <p>
+            Selecione o serviço, escolha o dia e depois
+            um horário disponível entre 09:00 e 19:30.
+          </p>
+
+        </div>
+
+        <div class="booking-layout">
+
+          <div class="booking-main">
+
+            <div class="booking-step">
+
+              <div class="booking-step-heading">
+
+                <span class="booking-step-number">
+                  01
+                </span>
+
+                <div>
+
+                  <strong>
+                    Escolha o serviço
+                  </strong>
+
+                  <small>
+                    Selecione o atendimento desejado
+                  </small>
+
+                </div>
+
+              </div>
+
+              <label
+                class="booking-select-label"
+                for="booking-service"
+              >
+                Serviço
+              </label>
+
+              <select
+                class="booking-select"
+                id="booking-service"
+              >
+
+                <option value="">
+                  Selecione um serviço
+                </option>
+
+                <option
+                  value="Barba"
+                  data-price="R$ 25,00"
+                >
+                  Barba — R$ 25,00
+                </option>
+
+                <option
+                  value="Corte"
+                  data-price="R$ 30,00"
+                >
+                  Corte — R$ 30,00
+                </option>
+
+                <option
+                  value="Corte + Barba"
+                  data-price="R$ 55,00"
+                >
+                  Corte + Barba — R$ 55,00
+                </option>
+
+                <option
+                  value="Corte + Graxa"
+                  data-price="R$ 50,00"
+                >
+                  Corte + Graxa — R$ 50,00
+                </option>
+
+                <option
+                  value="Corte + Hidratação"
+                  data-price="R$ 45,00"
+                >
+                  Corte + Hidratação — R$ 45,00
+                </option>
+
+                <option
+                  value="Corte + Sobrancelha"
+                  data-price="R$ 40,00"
+                >
+                  Corte + Sobrancelha — R$ 40,00
+                </option>
+
+                <option
+                  value="Corte + Barba + Sobrancelha"
+                  data-price="R$ 65,00"
+                >
+                  Corte + Barba + Sobrancelha — R$ 65,00
+                </option>
+
+                <option
+                  value="Corte + Barba + Sobrancelha + Limpeza de Pele"
+                  data-price="R$ 110,00"
+                >
+                  Corte + Barba + Sobrancelha + Limpeza de Pele — R$ 110,00
+                </option>
+
+                <option
+                  value="Corte + Bigode"
+                  data-price="R$ 40,00"
+                >
+                  Corte + Bigode — R$ 40,00
+                </option>
+
+                <option
+                  value="Corte + Bigode + Sobrancelha"
+                  data-price="R$ 45,00"
+                >
+                  Corte + Bigode + Sobrancelha — R$ 45,00
+                </option>
+
+                <option
+                  value="Corte + Sobrancelha + Limpeza de Pele"
+                  data-price="R$ 85,00"
+                >
+                  Corte + Sobrancelha + Limpeza de Pele — R$ 85,00
+                </option>
+
+                <option
+                  value="Graxa"
+                  data-price="R$ 20,00"
+                >
+                  Graxa — R$ 20,00
+                </option>
+
+                <option
+                  value="Limpeza de Pele"
+                  data-price="R$ 50,00"
+                >
+                  Limpeza de Pele — R$ 50,00
+                </option>
+
+              </select>
+
+            </div>
+
+            <div class="booking-step">
+
+              <div class="booking-step-heading">
+
+                <span class="booking-step-number">
+                  02
+                </span>
+
+                <div>
+
+                  <strong>
+                    Escolha o dia
+                  </strong>
+
+                  <small>
+                    Todos os dias da semana
+                  </small>
+
+                </div>
+
+              </div>
+
+              <div
+                class="booking-days"
+                id="booking-days"
+                aria-label="Escolha o dia do atendimento"
+              ></div>
+
+            </div>
+
+            <div class="booking-step">
+
+              <div class="booking-step-heading">
+
+                <span class="booking-step-number">
+                  03
+                </span>
+
+                <div>
+
+                  <strong>
+                    Escolha o horário
+                  </strong>
+
+                  <small>
+                    Das 09:00 às 19:30
+                  </small>
+
+                </div>
+
+              </div>
+
+              <div
+                class="booking-times"
+                id="booking-times"
+                aria-label="Escolha o horário do atendimento"
+              >
+
+                <div class="booking-empty">
+                  Escolha um dia para visualizar os horários.
+                </div>
+
+              </div>
+
+            </div>
+
+          </div>
+
+          <aside class="booking-summary">
+
+            <div class="booking-summary-top">
+
+              <span>
+                SEU AGENDAMENTO
+              </span>
+
+              <strong>
+                Confira antes de continuar
+              </strong>
+
+            </div>
+
+            <div class="booking-summary-list">
+
+              <div>
+
+                <span>
+                  Serviço
+                </span>
+
+                <strong id="summary-service">
+                  Não selecionado
+                </strong>
+
+              </div>
+
+              <div>
+
+                <span>
+                  Valor
+                </span>
+
+                <strong id="summary-price">
+                  —
+                </strong>
+
+              </div>
+
+              <div>
+
+                <span>
+                  Dia
+                </span>
+
+                <strong id="summary-date">
+                  Não selecionado
+                </strong>
+
+              </div>
+
+              <div>
+
+                <span>
+                  Horário
+                </span>
+
+                <strong id="summary-time">
+                  Não selecionado
+                </strong>
+
+              </div>
+
+            </div>
+
+            <div class="booking-notice">
+
+              <strong>
+                Importante
+              </strong>
+
+              <p>
+                O envio da solicitação não reserva automaticamente
+                o horário. A GNG confirma o atendimento pelo WhatsApp.
+              </p>
+
+            </div>
+
+            <button
+              class="btn btn-primary full booking-submit"
+              id="booking-submit"
+              type="button"
+              disabled
+            >
+              Confirmar pelo WhatsApp
+            </button>
+
+          </aside>
 
         </div>
 
@@ -559,6 +1003,7 @@
         <div class="section-head">
 
           <div>
+
             <p class="eyebrow eyebrow-light">
               PORTFÓLIO
             </p>
@@ -566,6 +1011,7 @@
             <h2>
               Trabalho que fala por si
             </h2>
+
           </div>
 
           <p>
@@ -585,8 +1031,15 @@
             >
 
             <figcaption>
-              <span>01</span>
-              <strong>Corte e acabamento</strong>
+
+              <span>
+                01
+              </span>
+
+              <strong>
+                Corte e acabamento
+              </strong>
+
             </figcaption>
 
           </figure>
@@ -599,8 +1052,15 @@
             >
 
             <figcaption>
-              <span>02</span>
-              <strong>Barba e desenho</strong>
+
+              <span>
+                02
+              </span>
+
+              <strong>
+                Barba e desenho
+              </strong>
+
             </figcaption>
 
           </figure>
@@ -650,9 +1110,9 @@
           </div>
 
           <p>
-            Imagens ilustrativas temporárias para apresentar
-            como ficará a seção até recebermos as fotos
-            oficiais da parte interna e externa da GNG.
+            Imagens ilustrativas temporárias até a GNG
+            fornecer as fotos oficiais da parte interna
+            e externa.
           </p>
 
         </div>
@@ -748,35 +1208,67 @@
         <div class="benefits">
 
           <div>
-            <span>01</span>
-            <strong>Mais economia</strong>
+
+            <span>
+              01
+            </span>
+
+            <strong>
+              Mais economia
+            </strong>
+
             <small>
               Melhor custo para quem mantém frequência.
             </small>
+
           </div>
 
           <div>
-            <span>02</span>
-            <strong>Mais praticidade</strong>
+
+            <span>
+              02
+            </span>
+
+            <strong>
+              Mais praticidade
+            </strong>
+
             <small>
               Seu cuidado entra na rotina.
             </small>
+
           </div>
 
           <div>
-            <span>03</span>
-            <strong>Visual impecável</strong>
+
+            <span>
+              03
+            </span>
+
+            <strong>
+              Visual impecável
+            </strong>
+
             <small>
               Manutenção durante todo o mês.
             </small>
+
           </div>
 
           <div>
-            <span>04</span>
-            <strong>Atendimento personalizado</strong>
+
+            <span>
+              04
+            </span>
+
+            <strong>
+              Atendimento personalizado
+            </strong>
+
             <small>
               Uma experiência mais próxima.
             </small>
+
           </div>
 
         </div>
@@ -794,18 +1286,31 @@
             </h3>
 
             <div class="price">
-              <span>R$</span>
-              <strong>85</strong>
-              <small>/mês</small>
+
+              <span>
+                R$
+              </span>
+
+              <strong>
+                85
+              </strong>
+
+              <small>
+                /mês
+              </small>
+
             </div>
 
             <ul>
+
               <li>
                 Cortes ilimitados durante 30 dias
               </li>
+
               <li>
                 Design de sobrancelhas incluso
               </li>
+
             </ul>
 
             <a
@@ -835,21 +1340,35 @@
             </h3>
 
             <div class="price">
-              <span>R$</span>
-              <strong>150</strong>
-              <small>/mês</small>
+
+              <span>
+                R$
+              </span>
+
+              <strong>
+                150
+              </strong>
+
+              <small>
+                /mês
+              </small>
+
             </div>
 
             <ul>
+
               <li>
                 Cortes ilimitados durante 30 dias
               </li>
+
               <li>
                 Barba ilimitada durante 30 dias
               </li>
+
               <li>
                 Design de sobrancelhas incluso
               </li>
+
             </ul>
 
             <a
@@ -994,16 +1513,14 @@
           </h2>
 
           <p>
-            Um clique e você fala direto com a barbearia.
+            Escolha o serviço, o dia e o horário no próprio site.
           </p>
 
         </div>
 
         <a
           class="btn btn-light"
-          href="https://wa.me/5561994075539?text=Ol%C3%A1%2C%20quero%20agendar%20meu%20pr%C3%B3ximo%20atendimento."
-          target="_blank"
-          rel="noopener noreferrer"
+          href="#agendamento"
         >
           Agendar agora
         </a>
@@ -1028,6 +1545,10 @@
 
         <a href="#servicos">
           Valores
+        </a>
+
+        <a href="#agendamento">
+          Agendamento
         </a>
 
         <a href="#portfolio">
@@ -1070,17 +1591,13 @@
 
   <div class="mobile-booking">
 
-    <a
-      href="https://wa.me/5561994075539?text=Ol%C3%A1%2C%20quero%20agendar%20um%20hor%C3%A1rio."
-      target="_blank"
-      rel="noopener noreferrer"
-    >
-      Agendar pelo WhatsApp
+    <a href="#agendamento">
+      Agendar horário
     </a>
 
   </div>
 
-  <script src="script.js?v=5.0"></script>
+  <script src="script.js?v=6.0"></script>
 
 </body>
 </html>
