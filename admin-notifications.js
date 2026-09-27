@@ -1,22 +1,47 @@
 (function () {
-  const POLL_INTERVAL = 5000;
-  const ORIGINAL_TITLE = document.title;
+  const POLL_INTERVAL =
+    5000;
+
+  const ORIGINAL_TITLE =
+    document.title;
 
   const state = {
-    knownPendingIds: new Set(),
-    baselineReady: false,
-    polling: false,
-    intervalId: null,
-    audioContext: null,
-    audioReady: false,
-    masterGain: null,
-    compressor: null,
-    soundButton: null,
-    titleTimeout: null
+    knownPendingIds:
+      new Set(),
+
+    baselineReady:
+      false,
+
+    polling:
+      false,
+
+    intervalId:
+      null,
+
+    audioContext:
+      null,
+
+    audioReady:
+      false,
+
+    masterGain:
+      null,
+
+    compressor:
+      null,
+
+    titleTimeout:
+      null,
+
+    notificationPermissionRequested:
+      false
   };
 
   function getClient() {
-    return window.supabaseClient || null;
+    return (
+      window.supabaseClient ||
+      null
+    );
   }
 
   function normalizeTime(value) {
@@ -24,33 +49,55 @@
       return "";
     }
 
-    return String(value).slice(0, 5);
+    return String(
+      value
+    ).slice(
+      0,
+      5
+    );
   }
 
-  function formatDateShort(dateKey) {
+  function formatDateShort(
+    dateKey
+  ) {
     if (!dateKey) {
       return "";
     }
 
-    const date = new Date(
-      dateKey + "T12:00:00Z"
-    );
+    const date =
+      new Date(
+        dateKey +
+          "T12:00:00Z"
+      );
 
     return new Intl.DateTimeFormat(
       "pt-BR",
       {
-        day: "2-digit",
-        month: "2-digit",
-        year: "numeric",
-        timeZone: "UTC"
+        day:
+          "2-digit",
+
+        month:
+          "2-digit",
+
+        year:
+          "numeric",
+
+        timeZone:
+          "UTC"
       }
-    ).format(date);
+    ).format(
+      date
+    );
   }
 
-  function getCustomerLabel(booking) {
-    const name = String(
-      booking.customer_name || ""
-    ).trim();
+  function getCustomerLabel(
+    booking
+  ) {
+    const name =
+      String(
+        booking.customer_name ||
+        ""
+      ).trim();
 
     if (
       !name ||
@@ -64,92 +111,29 @@
   }
 
   function escapeHtml(value) {
-    return String(value ?? "")
-      .replaceAll("&", "&amp;")
-      .replaceAll("<", "&lt;")
-      .replaceAll(">", "&gt;")
-      .replaceAll('"', "&quot;")
-      .replaceAll("'", "&#039;");
-  }
-
-  function updateSoundButton() {
-    if (!state.soundButton) {
-      return;
-    }
-
-    if (state.audioReady) {
-      state.soundButton.textContent =
-        "🔊 SOM ATIVO";
-
-      state.soundButton.title =
-        "Clique para testar o som";
-    } else {
-      state.soundButton.textContent =
-        "🔇 ATIVAR SOM";
-
-      state.soundButton.title =
-        "Clique para ativar os avisos sonoros";
-    }
-  }
-
-  function createSoundButton() {
-    const existing =
-      document.getElementById(
-        "gng-sound-button"
+    return String(
+      value ?? ""
+    )
+      .replaceAll(
+        "&",
+        "&amp;"
+      )
+      .replaceAll(
+        "<",
+        "&lt;"
+      )
+      .replaceAll(
+        ">",
+        "&gt;"
+      )
+      .replaceAll(
+        '"',
+        "&quot;"
+      )
+      .replaceAll(
+        "'",
+        "&#039;"
       );
-
-    if (existing) {
-      state.soundButton = existing;
-      updateSoundButton();
-      return;
-    }
-
-    const headerActions =
-      document.querySelector(
-        ".admin-header-actions"
-      );
-
-    if (!headerActions) {
-      return;
-    }
-
-    const button =
-      document.createElement(
-        "button"
-      );
-
-    button.id =
-      "gng-sound-button";
-
-    button.type =
-      "button";
-
-    button.className =
-      "admin-secondary-button";
-
-    button.textContent =
-      "🔇 ATIVAR SOM";
-
-    button.title =
-      "Ativar avisos sonoros";
-
-    button.addEventListener(
-      "click",
-      async function () {
-        await activateAudio(true);
-        await requestNotificationPermission();
-      }
-    );
-
-    headerActions.insertBefore(
-      button,
-      headerActions.firstChild
-    );
-
-    state.soundButton =
-      button;
-
-    updateSoundButton();
   }
 
   function getAudioContextClass() {
@@ -160,7 +144,9 @@
     );
   }
 
-  function ensureAudioGraph(context) {
+  function ensureAudioGraph(
+    context
+  ) {
     if (
       state.masterGain &&
       state.compressor
@@ -175,7 +161,7 @@
       context.createDynamicsCompressor();
 
     masterGain.gain.setValueAtTime(
-      0.95,
+      0.98,
       context.currentTime
     );
 
@@ -185,22 +171,22 @@
     );
 
     compressor.knee.setValueAtTime(
-      12,
+      10,
       context.currentTime
     );
 
     compressor.ratio.setValueAtTime(
-      5,
+      6,
       context.currentTime
     );
 
     compressor.attack.setValueAtTime(
-      0.003,
+      0.002,
       context.currentTime
     );
 
     compressor.release.setValueAtTime(
-      0.2,
+      0.18,
       context.currentTime
     );
 
@@ -219,26 +205,18 @@
       compressor;
   }
 
-  async function activateAudio(
-    playTest = false
-  ) {
+  async function activateAudio() {
     const AudioContextClass =
       getAudioContextClass();
 
     if (!AudioContextClass) {
-      if (state.soundButton) {
-        state.soundButton.textContent =
-          "SOM INDISPONÍVEL";
-
-        state.soundButton.disabled =
-          true;
-      }
-
       return false;
     }
 
     try {
-      if (!state.audioContext) {
+      if (
+        !state.audioContext
+      ) {
         state.audioContext =
           new AudioContextClass();
       }
@@ -261,26 +239,15 @@
         context.state ===
         "running";
 
-      updateSoundButton();
-
-      if (
-        state.audioReady &&
-        playTest
-      ) {
-        await playBookingSound();
-      }
-
       return state.audioReady;
     } catch (error) {
       console.error(
-        "Não foi possível ativar o áudio:",
+        "Não foi possível liberar o áudio:",
         error
       );
 
       state.audioReady =
         false;
-
-      updateSoundButton();
 
       return false;
     }
@@ -315,17 +282,20 @@
 
     gain.gain.exponentialRampToValueAtTime(
       volume,
-      start + 0.012
+      start +
+        0.012
     );
 
     gain.gain.setValueAtTime(
       volume,
-      start + 0.04
+      start +
+        0.04
     );
 
     gain.gain.exponentialRampToValueAtTime(
       0.0001,
-      start + duration
+      start +
+        duration
     );
 
     oscillator.connect(
@@ -357,7 +327,7 @@
       740,
       start,
       0.24,
-      0.5,
+      0.58,
       "triangle"
     );
 
@@ -365,44 +335,48 @@
       context,
       1480,
       start,
-      0.2,
-      0.2,
+      0.22,
+      0.24,
       "sine"
     );
 
     createTone(
       context,
       880,
-      start + 0.16,
+      start +
+        0.16,
       0.3,
-      0.56,
+      0.64,
       "triangle"
     );
 
     createTone(
       context,
       1760,
-      start + 0.16,
-      0.24,
-      0.23,
+      start +
+        0.16,
+      0.26,
+      0.27,
       "sine"
     );
 
     createTone(
       context,
       1046.5,
-      start + 0.36,
-      0.42,
-      0.62,
+      start +
+        0.36,
+      0.44,
+      0.72,
       "triangle"
     );
 
     createTone(
       context,
       2093,
-      start + 0.36,
+      start +
+        0.36,
+      0.34,
       0.3,
-      0.25,
       "sine"
     );
   }
@@ -416,7 +390,9 @@
     }
 
     try {
-      if (!state.audioContext) {
+      if (
+        !state.audioContext
+      ) {
         state.audioContext =
           new AudioContextClass();
       }
@@ -445,15 +421,11 @@
         state.audioReady =
           false;
 
-        updateSoundButton();
-
         return false;
       }
 
       state.audioReady =
         true;
-
-      updateSoundButton();
 
       const now =
         context.currentTime +
@@ -466,7 +438,8 @@
 
       playAlertSequence(
         context,
-        now + 0.82
+        now +
+          0.82
       );
 
       return true;
@@ -478,8 +451,6 @@
 
       state.audioReady =
         false;
-
-      updateSoundButton();
 
       return false;
     }
@@ -508,6 +479,15 @@
     ) {
       return false;
     }
+
+    if (
+      state.notificationPermissionRequested
+    ) {
+      return false;
+    }
+
+    state.notificationPermissionRequested =
+      true;
 
     try {
       const permission =
@@ -548,15 +528,29 @@
     Object.assign(
       container.style,
       {
-        position: "fixed",
-        top: "100px",
-        right: "20px",
-        zIndex: "99999",
+        position:
+          "fixed",
+
+        top:
+          "100px",
+
+        right:
+          "20px",
+
+        zIndex:
+          "99999",
+
         width:
           "min(390px, calc(100vw - 30px))",
-        display: "grid",
-        gap: "10px",
-        pointerEvents: "none"
+
+        display:
+          "grid",
+
+        gap:
+          "10px",
+
+        pointerEvents:
+          "none"
       }
     );
 
@@ -601,24 +595,45 @@
     Object.assign(
       card.style,
       {
-        position: "relative",
-        overflow: "hidden",
+        position:
+          "relative",
+
+        overflow:
+          "hidden",
+
         padding:
           "18px 48px 18px 20px",
+
         border:
           "1px solid rgba(34, 51, 79, 0.16)",
-        borderRadius: "15px",
-        background: "#ffffff",
-        color: "#17243a",
+
+        borderRadius:
+          "15px",
+
+        background:
+          "#ffffff",
+
+        color:
+          "#17243a",
+
         boxShadow:
           "0 22px 60px rgba(13, 23, 40, 0.22)",
+
         fontFamily:
           "Inter, Arial, sans-serif",
-        pointerEvents: "auto",
-        cursor: "pointer",
-        opacity: "0",
+
+        pointerEvents:
+          "auto",
+
+        cursor:
+          "pointer",
+
+        opacity:
+          "0",
+
         transform:
           "translateX(30px)",
+
         transition:
           "opacity .25s ease, transform .25s ease"
       }
@@ -720,17 +735,38 @@
     Object.assign(
       close.style,
       {
-        position: "absolute",
-        top: "10px",
-        right: "10px",
-        width: "30px",
-        height: "30px",
-        border: "0",
-        borderRadius: "8px",
-        background: "#edf1f5",
-        color: "#17243a",
-        fontSize: "18px",
-        cursor: "pointer"
+        position:
+          "absolute",
+
+        top:
+          "10px",
+
+        right:
+          "10px",
+
+        width:
+          "30px",
+
+        height:
+          "30px",
+
+        border:
+          "0",
+
+        borderRadius:
+          "8px",
+
+        background:
+          "#edf1f5",
+
+        color:
+          "#17243a",
+
+        fontSize:
+          "18px",
+
+        cursor:
+          "pointer"
       }
     );
 
@@ -835,7 +871,8 @@
         new Event(
           "change",
           {
-            bubbles: true
+            bubbles:
+              true
           }
         )
       );
@@ -904,9 +941,14 @@
               "gng-booking-" +
               booking.id,
 
-            renotify: true,
-            requireInteraction: true,
-            silent: false
+            renotify:
+              true,
+
+            requireInteraction:
+              true,
+
+            silent:
+              false
           }
         );
 
@@ -1117,7 +1159,8 @@
 
     try {
       const {
-        data: sessionData
+        data:
+          sessionData
       } =
         await client.auth.getSession();
 
@@ -1312,36 +1355,57 @@
     );
   }
 
-  function setupAudioUnlock() {
+  function handleUserInteraction() {
+    activateAudio();
+
+    const dashboard =
+      document.getElementById(
+        "admin-dashboard"
+      );
+
+    if (
+      dashboard &&
+      !dashboard.hidden &&
+      "Notification" in
+        window &&
+      Notification.permission ===
+        "default"
+    ) {
+      requestNotificationPermission();
+    }
+  }
+
+  function setupAutomaticAudio() {
     document.addEventListener(
       "pointerdown",
-      function () {
-        if (
-          !state.audioReady
-        ) {
-          activateAudio(
-            false
-          );
-        }
-      },
+      handleUserInteraction,
       {
-        capture: true
+        capture:
+          true,
+
+        passive:
+          true
       }
     );
 
     document.addEventListener(
       "keydown",
-      function () {
-        if (
-          !state.audioReady
-        ) {
-          activateAudio(
-            false
-          );
-        }
-      },
+      handleUserInteraction,
       {
-        capture: true
+        capture:
+          true
+      }
+    );
+
+    document.addEventListener(
+      "touchstart",
+      handleUserInteraction,
+      {
+        capture:
+          true,
+
+        passive:
+          true
       }
     );
 
@@ -1354,23 +1418,22 @@
       loginForm.addEventListener(
         "submit",
         function () {
-          activateAudio(
-            false
-          );
+          activateAudio();
 
           requestNotificationPermission();
         },
         {
-          capture: true
+          capture:
+            true
         }
       );
     }
+
+    activateAudio();
   }
 
   function initialize() {
-    createSoundButton();
-
-    setupAudioUnlock();
+    setupAutomaticAudio();
 
     setupAuthenticationWatcher();
 
