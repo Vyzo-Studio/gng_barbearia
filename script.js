@@ -1,91 +1,49 @@
-const menuToggle =
-  document.getElementById(
-    "menu-toggle"
-  );
+const menuToggle = document.getElementById("menu-toggle");
+const mainNav = document.getElementById("main-nav");
+const year = document.getElementById("year");
 
-const mainNav =
-  document.getElementById(
-    "main-nav"
-  );
+const bookingService = document.getElementById("booking-service");
+const bookingDays = document.getElementById("booking-days");
+const bookingTimes = document.getElementById("booking-times");
+const bookingSubmit = document.getElementById("booking-submit");
 
-const year =
-  document.getElementById(
-    "year"
-  );
+const summaryService = document.getElementById("summary-service");
+const summaryPrice = document.getElementById("summary-price");
+const summaryDate = document.getElementById("summary-date");
+const summaryTime = document.getElementById("summary-time");
 
-const bookingService =
-  document.getElementById(
-    "booking-service"
-  );
+const serviceLinks = Array.from(
+  document.querySelectorAll("[data-service-link]")
+);
 
-const bookingDays =
-  document.getElementById(
-    "booking-days"
-  );
+const WHATSAPP_NUMBER = "5561994075539";
 
-const bookingTimes =
-  document.getElementById(
-    "booking-times"
-  );
+const SUPABASE_URL =
+  "https://ueqfokfnjsjgocotvdae.supabase.co";
 
-const bookingSubmit =
-  document.getElementById(
-    "booking-submit"
-  );
-
-const summaryService =
-  document.getElementById(
-    "summary-service"
-  );
-
-const summaryPrice =
-  document.getElementById(
-    "summary-price"
-  );
-
-const summaryDate =
-  document.getElementById(
-    "summary-date"
-  );
-
-const summaryTime =
-  document.getElementById(
-    "summary-time"
-  );
-
-const serviceLinks =
-  Array.from(
-    document.querySelectorAll(
-      "[data-service-link]"
-    )
-  );
-
-const WHATSAPP_NUMBER =
-  "5561994075539";
+const SUPABASE_PUBLISHABLE_KEY =
+  "sb_publishable_YqWCSylIzOdQcxuJFpE9dQ_3mVV4oji";
 
 const BUSINESS_TIMEZONE =
   "America/Sao_Paulo";
 
-const SLOT_START_HOUR =
-  9;
+const SLOT_START_HOUR = 9;
+const SLOT_START_MINUTE = 0;
 
-const SLOT_START_MINUTE =
-  0;
+const SLOT_END_HOUR = 19;
+const SLOT_END_MINUTE = 30;
 
-const SLOT_END_HOUR =
-  19;
-
-const SLOT_END_MINUTE =
-  30;
-
-const SLOT_INTERVAL =
-  30;
-
-const BOOKING_DAYS_COUNT =
-  7;
+const SLOT_INTERVAL = 30;
+const BOOKING_DAYS_COUNT = 7;
 
 let selectedDate = null;
 let selectedTime = null;
+
+let blockedSlots =
+  new Map();
+
+let bookingRequestInProgress =
+  false;
 
 if (year) {
   year.textContent =
@@ -93,10 +51,7 @@ if (year) {
 }
 
 function closeMenu() {
-  if (
-    !menuToggle ||
-    !mainNav
-  ) {
+  if (!menuToggle || !mainNav) {
     return;
   }
 
@@ -124,10 +79,7 @@ function closeMenu() {
 }
 
 function openMenu() {
-  if (
-    !menuToggle ||
-    !mainNav
-  ) {
+  if (!menuToggle || !mainNav) {
     return;
   }
 
@@ -155,10 +107,7 @@ function openMenu() {
 }
 
 function setupMenu() {
-  if (
-    !menuToggle ||
-    !mainNav
-  ) {
+  if (!menuToggle || !mainNav) {
     return;
   }
 
@@ -219,10 +168,7 @@ function setupMenu() {
   document.addEventListener(
     "keydown",
     function (event) {
-      if (
-        event.key ===
-        "Escape"
-      ) {
+      if (event.key === "Escape") {
         closeMenu();
       }
     }
@@ -232,8 +178,7 @@ function setupMenu() {
     "resize",
     function () {
       if (
-        window.innerWidth >
-        860
+        window.innerWidth > 860
       ) {
         closeMenu();
       }
@@ -278,43 +223,31 @@ function getBusinessDateParts() {
       ) {
         result[
           part.type
-        ] =
-          part.value;
+        ] = part.value;
       }
     }
   );
 
   return {
     year:
-      Number(
-        result.year
-      ),
+      Number(result.year),
     month:
-      Number(
-        result.month
-      ),
+      Number(result.month),
     day:
-      Number(
-        result.day
-      ),
+      Number(result.day),
     hour:
-      Number(
-        result.hour
-      ),
+      Number(result.hour),
     minute:
-      Number(
-        result.minute
-      )
+      Number(result.minute)
   };
 }
 
 function padNumber(value) {
-  return String(
-    value
-  ).padStart(
-    2,
-    "0"
-  );
+  return String(value)
+    .padStart(
+      2,
+      "0"
+    );
 }
 
 function buildDateKey(
@@ -369,9 +302,7 @@ function addDays(
   return result;
 }
 
-function dateToKey(
-  date
-) {
+function dateToKey(date) {
   return buildDateKey(
     date.getUTCFullYear(),
     date.getUTCMonth() + 1,
@@ -379,9 +310,7 @@ function dateToKey(
   );
 }
 
-function formatWeekday(
-  date
-) {
+function formatWeekday(date) {
   return new Intl.DateTimeFormat(
     "pt-BR",
     {
@@ -391,18 +320,14 @@ function formatWeekday(
         "UTC"
     }
   )
-    .format(
-      date
-    )
+    .format(date)
     .replace(
       ".",
       ""
     );
 }
 
-function formatMonth(
-  date
-) {
+function formatMonth(date) {
   return new Intl.DateTimeFormat(
     "pt-BR",
     {
@@ -412,18 +337,14 @@ function formatMonth(
         "UTC"
     }
   )
-    .format(
-      date
-    )
+    .format(date)
     .replace(
       ".",
       ""
     );
 }
 
-function formatFullDate(
-  date
-) {
+function formatFullDate(date) {
   return new Intl.DateTimeFormat(
     "pt-BR",
     {
@@ -438,14 +359,10 @@ function formatFullDate(
       timeZone:
         "UTC"
     }
-  ).format(
-    date
-  );
+  ).format(date);
 }
 
-function capitalizeFirst(
-  value
-) {
+function capitalizeFirst(value) {
   if (!value) {
     return "";
   }
@@ -455,6 +372,17 @@ function capitalizeFirst(
       .charAt(0)
       .toUpperCase() +
     value.slice(1)
+  );
+}
+
+function getTodayDate() {
+  const now =
+    getBusinessDateParts();
+
+  return createUtcDate(
+    now.year,
+    now.month,
+    now.day
   );
 }
 
@@ -474,10 +402,36 @@ function getCurrentMinutes() {
     getBusinessDateParts();
 
   return (
-    now.hour *
-      60 +
+    now.hour * 60 +
     now.minute
   );
+}
+
+function timeToMinutes(time) {
+  if (!time) {
+    return 0;
+  }
+
+  const parts =
+    time.split(":");
+
+  return (
+    Number(parts[0]) *
+      60 +
+    Number(parts[1])
+  );
+}
+
+function normalizeDatabaseTime(time) {
+  if (!time) {
+    return "";
+  }
+
+  return String(time)
+    .slice(
+      0,
+      5
+    );
 }
 
 function generateSlots() {
@@ -508,15 +462,10 @@ function generateSlots() {
 
     slots.push({
       value:
-        padNumber(
-          hour
-        ) +
+        padNumber(hour) +
         ":" +
-        padNumber(
-          minute
-        ),
-      minutes:
-        minutes
+        padNumber(minute),
+      minutes
     });
   }
 
@@ -526,33 +475,201 @@ function generateSlots() {
 function hasAvailableTime(
   dateKey
 ) {
-  if (
-    dateKey !==
-    getTodayKey()
-  ) {
-    return true;
-  }
-
-  const currentMinutes =
-    getCurrentMinutes();
-
   const slots =
     generateSlots();
 
   return slots.some(
     function (slot) {
-      return (
-        slot.minutes >
-        currentMinutes
-      );
+      if (
+        isSlotBlocked(
+          dateKey,
+          slot.value
+        )
+      ) {
+        return false;
+      }
+
+      if (
+        dateKey ===
+        getTodayKey() &&
+        slot.minutes <=
+          getCurrentMinutes()
+      ) {
+        return false;
+      }
+
+      return true;
     }
   );
 }
 
-function updateServiceSummary() {
+async function supabaseRpc(
+  functionName,
+  payload
+) {
+  const response =
+    await fetch(
+      SUPABASE_URL +
+        "/rest/v1/rpc/" +
+        functionName,
+      {
+        method:
+          "POST",
+
+        headers: {
+          "Content-Type":
+            "application/json",
+
+          apikey:
+            SUPABASE_PUBLISHABLE_KEY
+        },
+
+        body:
+          JSON.stringify(
+            payload
+          )
+      }
+    );
+
+  let data = null;
+
+  const contentType =
+    response.headers.get(
+      "content-type"
+    );
+
   if (
-    !bookingService
+    contentType &&
+    contentType.includes(
+      "application/json"
+    )
   ) {
+    data =
+      await response.json();
+  } else {
+    data =
+      await response.text();
+  }
+
+  if (!response.ok) {
+    let message =
+      "Não foi possível concluir a operação.";
+
+    if (
+      data &&
+      typeof data ===
+        "object" &&
+      data.message
+    ) {
+      message =
+        data.message;
+    }
+
+    throw new Error(
+      message
+    );
+  }
+
+  return data;
+}
+
+function clearBlockedSlots() {
+  blockedSlots =
+    new Map();
+}
+
+function addBlockedSlot(
+  date,
+  time
+) {
+  if (
+    !blockedSlots.has(
+      date
+    )
+  ) {
+    blockedSlots.set(
+      date,
+      new Set()
+    );
+  }
+
+  blockedSlots
+    .get(date)
+    .add(time);
+}
+
+function isSlotBlocked(
+  date,
+  time
+) {
+  if (
+    !blockedSlots.has(
+      date
+    )
+  ) {
+    return false;
+  }
+
+  return blockedSlots
+    .get(date)
+    .has(time);
+}
+
+async function loadBookedSlots() {
+  try {
+    const today =
+      getTodayDate();
+
+    const finalDate =
+      addDays(
+        today,
+        BOOKING_DAYS_COUNT - 1
+      );
+
+    const data =
+      await supabaseRpc(
+        "get_public_booked_slots",
+        {
+          p_start_date:
+            dateToKey(today),
+
+          p_end_date:
+            dateToKey(
+              finalDate
+            )
+        }
+      );
+
+    clearBlockedSlots();
+
+    if (
+      Array.isArray(data)
+    ) {
+      data.forEach(
+        function (booking) {
+          addBlockedSlot(
+            booking.booking_date,
+            normalizeDatabaseTime(
+              booking.booking_time
+            )
+          );
+        }
+      );
+    }
+
+    renderTimes();
+
+    updateSubmitState();
+  } catch (error) {
+    console.error(
+      "Erro ao carregar horários ocupados:",
+      error
+    );
+  }
+}
+
+function updateServiceSummary() {
+  if (!bookingService) {
     return;
   }
 
@@ -570,17 +687,13 @@ function updateServiceSummary() {
         ""
       : "";
 
-  if (
-    summaryService
-  ) {
+  if (summaryService) {
     summaryService.textContent =
       service ||
       "Não selecionado";
   }
 
-  if (
-    summaryPrice
-  ) {
+  if (summaryPrice) {
     summaryPrice.textContent =
       price ||
       "—";
@@ -592,9 +705,7 @@ function updateServiceSummary() {
 function updateDateSummary(
   date
 ) {
-  if (
-    !summaryDate
-  ) {
+  if (!summaryDate) {
     return;
   }
 
@@ -614,9 +725,7 @@ function updateDateSummary(
 }
 
 function updateTimeSummary() {
-  if (
-    !summaryTime
-  ) {
+  if (!summaryTime) {
     return;
   }
 
@@ -633,36 +742,43 @@ function updateSubmitState() {
     return;
   }
 
+  const dateKey =
+    selectedDate
+      ? dateToKey(
+          selectedDate
+        )
+      : null;
+
+  const occupied =
+    dateKey &&
+    selectedTime
+      ? isSlotBlocked(
+          dateKey,
+          selectedTime
+        )
+      : false;
+
   bookingSubmit.disabled =
+    bookingRequestInProgress ||
     !bookingService.value ||
     !selectedDate ||
-    !selectedTime;
+    !selectedTime ||
+    occupied;
 }
 
 function renderDays() {
-  if (
-    !bookingDays
-  ) {
+  if (!bookingDays) {
     return;
   }
 
   bookingDays.innerHTML =
     "";
 
-  const now =
-    getBusinessDateParts();
-
   const today =
-    createUtcDate(
-      now.year,
-      now.month,
-      now.day
-    );
+    getTodayDate();
 
   const todayKey =
-    dateToKey(
-      today
-    );
+    dateToKey(today);
 
   let firstAvailableDate =
     null;
@@ -670,7 +786,7 @@ function renderDays() {
   for (
     let index = 0;
     index <
-    BOOKING_DAYS_COUNT;
+      BOOKING_DAYS_COUNT;
     index += 1
   ) {
     const date =
@@ -700,9 +816,7 @@ function renderDays() {
 
     button.innerHTML =
       "<span>" +
-      formatWeekday(
-        date
-      ) +
+      formatWeekday(date) +
       "</span>" +
       "<strong>" +
       padNumber(
@@ -710,9 +824,7 @@ function renderDays() {
       ) +
       "</strong>" +
       "<small>" +
-      formatMonth(
-        date
-      ) +
+      formatMonth(date) +
       "</small>";
 
     if (
@@ -757,9 +869,7 @@ function renderDays() {
   }
 }
 
-function selectDate(
-  date
-) {
+function selectDate(date) {
   selectedDate =
     new Date(
       date.getTime()
@@ -851,9 +961,6 @@ function renderTimes() {
       button.className =
         "booking-time";
 
-      button.textContent =
-        slot.value;
-
       button.dataset.time =
         slot.value;
 
@@ -863,7 +970,37 @@ function renderTimes() {
         slot.minutes <=
           currentMinutes;
 
-      if (passed) {
+      const occupied =
+        isSlotBlocked(
+          selectedKey,
+          slot.value
+        );
+
+      if (occupied) {
+        button.textContent =
+          "X";
+
+        button.disabled =
+          true;
+
+        button.classList.add(
+          "is-disabled",
+          "is-occupied"
+        );
+
+        button.setAttribute(
+          "aria-label",
+          slot.value +
+            " ocupado"
+        );
+
+        button.title =
+          slot.value +
+          " — horário ocupado";
+      } else if (passed) {
+        button.textContent =
+          slot.value;
+
         button.disabled =
           true;
 
@@ -877,6 +1014,28 @@ function renderTimes() {
             " indisponível"
         );
       } else {
+        button.textContent =
+          slot.value;
+
+        if (
+          selectedTime ===
+          slot.value
+        ) {
+          button.classList.add(
+            "is-selected"
+          );
+
+          button.setAttribute(
+            "aria-pressed",
+            "true"
+          );
+        } else {
+          button.setAttribute(
+            "aria-pressed",
+            "false"
+          );
+        }
+
         button.setAttribute(
           "aria-label",
           "Selecionar horário " +
@@ -905,6 +1064,26 @@ function selectTime(
   time,
   button
 ) {
+  if (
+    !selectedDate
+  ) {
+    return;
+  }
+
+  const dateKey =
+    dateToKey(
+      selectedDate
+    );
+
+  if (
+    isSlotBlocked(
+      dateKey,
+      time
+    )
+  ) {
+    return;
+  }
+
   selectedTime =
     time;
 
@@ -945,9 +1124,7 @@ function selectTime(
 function findServiceOption(
   service
 ) {
-  if (
-    !bookingService
-  ) {
+  if (!bookingService) {
     return null;
   }
 
@@ -966,9 +1143,7 @@ function findServiceOption(
 function selectServiceFromLink(
   service
 ) {
-  if (
-    !bookingService
-  ) {
+  if (!bookingService) {
     return;
   }
 
@@ -1039,7 +1214,7 @@ function buildWhatsappMessage() {
 
   return (
     "Olá, GNG Barbearia! " +
-    "Vim pelo site e gostaria de solicitar este agendamento:\n\n" +
+    "Vim pelo site e fiz uma solicitação de agendamento:\n\n" +
     "Serviço: " +
     service +
     "\n" +
@@ -1052,20 +1227,11 @@ function buildWhatsappMessage() {
     "Horário: " +
     selectedTime +
     "\n\n" +
-    "Podem confirmar se esse horário está disponível?"
+    "Gostaria de confirmar meu atendimento."
   );
 }
 
-function submitBooking() {
-  if (
-    !bookingService ||
-    !bookingService.value ||
-    !selectedDate ||
-    !selectedTime
-  ) {
-    return;
-  }
-
+function openWhatsapp() {
   const message =
     buildWhatsappMessage();
 
@@ -1090,6 +1256,111 @@ function submitBooking() {
   }
 }
 
+async function submitBooking() {
+  if (
+    bookingRequestInProgress ||
+    !bookingService ||
+    !bookingService.value ||
+    !selectedDate ||
+    !selectedTime
+  ) {
+    return;
+  }
+
+  const bookingDate =
+    dateToKey(
+      selectedDate
+    );
+
+  if (
+    isSlotBlocked(
+      bookingDate,
+      selectedTime
+    )
+  ) {
+    alert(
+      "Esse horário acabou de ser ocupado. Escolha outro horário."
+    );
+
+    await loadBookedSlots();
+
+    return;
+  }
+
+  bookingRequestInProgress =
+    true;
+
+  const originalText =
+    bookingSubmit
+      ? bookingSubmit.textContent
+      : "";
+
+  if (bookingSubmit) {
+    bookingSubmit.disabled =
+      true;
+
+    bookingSubmit.textContent =
+      "Reservando horário...";
+  }
+
+  try {
+    await supabaseRpc(
+      "create_booking_request",
+      {
+        p_customer_name:
+          "Cliente via WhatsApp",
+
+        p_service:
+          bookingService.value,
+
+        p_booking_date:
+          bookingDate,
+
+        p_booking_time:
+          selectedTime
+      }
+    );
+
+    addBlockedSlot(
+      bookingDate,
+      selectedTime
+    );
+
+    openWhatsapp();
+  } catch (error) {
+    await loadBookedSlots();
+
+    const message =
+      error &&
+      error.message
+        ? error.message
+        : "Não foi possível reservar esse horário.";
+
+    alert(
+      message +
+        "\n\nEscolha outro horário e tente novamente."
+    );
+
+    selectedTime =
+      null;
+
+    updateTimeSummary();
+
+    renderTimes();
+  } finally {
+    bookingRequestInProgress =
+      false;
+
+    if (bookingSubmit) {
+      bookingSubmit.textContent =
+        originalText ||
+        "Confirmar pelo WhatsApp";
+    }
+
+    updateSubmitState();
+  }
+}
+
 function setupBooking() {
   if (
     !bookingService ||
@@ -1106,9 +1377,7 @@ function setupBooking() {
     }
   );
 
-  if (
-    bookingSubmit
-  ) {
+  if (bookingSubmit) {
     bookingSubmit.addEventListener(
       "click",
       submitBooking
@@ -1124,6 +1393,8 @@ function setupBooking() {
   updateTimeSummary();
 
   updateSubmitState();
+
+  loadBookedSlots();
 }
 
 function setupInternalLinks() {
@@ -1171,6 +1442,7 @@ function setupInternalLinks() {
               ).matches
                 ? "auto"
                 : "smooth",
+
             block:
               "start"
           });
@@ -1182,17 +1454,30 @@ function setupInternalLinks() {
 
 function refreshCurrentDayState() {
   if (
-    !selectedDate
+    selectedDate &&
+    selectedTime
   ) {
-    return;
+    const selectedKey =
+      dateToKey(
+        selectedDate
+      );
+
+    if (
+      selectedKey ===
+        getTodayKey() &&
+      timeToMinutes(
+        selectedTime
+      ) <=
+        getCurrentMinutes()
+    ) {
+      selectedTime =
+        null;
+
+      updateTimeSummary();
+    }
   }
 
   renderTimes();
-
-  selectedTime =
-    null;
-
-  updateTimeSummary();
 
   updateSubmitState();
 }
@@ -1207,6 +1492,11 @@ function initializeSite() {
   window.setInterval(
     refreshCurrentDayState,
     60000
+  );
+
+  window.setInterval(
+    loadBookedSlots,
+    30000
   );
 }
 
