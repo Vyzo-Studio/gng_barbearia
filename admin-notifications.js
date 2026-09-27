@@ -1,14 +1,10 @@
 (function () {
-  const POLL_INTERVAL =
-    5000;
-
-  const BUSINESS_TIMEZONE =
-    "America/Sao_Paulo";
+  const POLL_INTERVAL = 5000;
 
   const ORIGINAL_TITLE =
     document.title;
 
-  const notificationState = {
+  const state = {
     knownPendingIds:
       new Set(),
 
@@ -24,8 +20,11 @@
     audioContext:
       null,
 
-    audioUnlocked:
+    audioReady:
       false,
+
+    soundButton:
+      null,
 
     titleTimeout:
       null
@@ -104,31 +103,139 @@
     return name;
   }
 
-  async function unlockAudio() {
+  function updateSoundButton() {
     if (
-      notificationState.audioUnlocked
+      !state.soundButton
     ) {
       return;
     }
 
-    const AudioContextClass =
-      window.AudioContext ||
-      window.webkitAudioContext;
+    if (
+      state.audioReady
+    ) {
+      state.soundButton.textContent =
+        "🔊 SOM ATIVO";
 
-    if (!AudioContextClass) {
+      state.soundButton.title =
+        "Clique para testar o som";
+    } else {
+      state.soundButton.textContent =
+        "🔇 ATIVAR SOM";
+
+      state.soundButton.title =
+        "Clique para ativar os avisos sonoros";
+    }
+  }
+
+  function createSoundButton() {
+    if (
+      document.getElementById(
+        "gng-sound-button"
+      )
+    ) {
+      state.soundButton =
+        document.getElementById(
+          "gng-sound-button"
+        );
+
+      updateSoundButton();
+
       return;
+    }
+
+    const headerActions =
+      document.querySelector(
+        ".admin-header-actions"
+      );
+
+    if (
+      !headerActions
+    ) {
+      return;
+    }
+
+    const button =
+      document.createElement(
+        "button"
+      );
+
+    button.id =
+      "gng-sound-button";
+
+    button.type =
+      "button";
+
+    button.className =
+      "admin-secondary-button";
+
+    button.textContent =
+      "🔇 ATIVAR SOM";
+
+    button.title =
+      "Ativar avisos sonoros";
+
+    button.addEventListener(
+      "click",
+      async function () {
+        await activateAudio(
+          true
+        );
+
+        await requestNotificationPermission();
+      }
+    );
+
+    headerActions.insertBefore(
+      button,
+      headerActions.firstChild
+    );
+
+    state.soundButton =
+      button;
+
+    updateSoundButton();
+  }
+
+  function getAudioContextClass() {
+    return (
+      window.AudioContext ||
+      window.webkitAudioContext ||
+      null
+    );
+  }
+
+  async function activateAudio(
+    playTest = false
+  ) {
+    const AudioContextClass =
+      getAudioContextClass();
+
+    if (
+      !AudioContextClass
+    ) {
+      if (
+        state.soundButton
+      ) {
+        state.soundButton.textContent =
+          "SOM INDISPONÍVEL";
+
+        state.soundButton.disabled =
+          true;
+      }
+
+      return false;
     }
 
     try {
       if (
-        !notificationState.audioContext
+        !state.audioContext
       ) {
-        notificationState.audioContext =
+        state.audioContext =
           new AudioContextClass();
       }
 
       const context =
-        notificationState.audioContext;
+        state.audioContext;
 
       if (
         context.state ===
@@ -137,50 +244,44 @@
         await context.resume();
       }
 
-      const oscillator =
-        context.createOscillator();
+      state.audioReady =
+        context.state ===
+        "running";
 
-      const gain =
-        context.createGain();
+      updateSoundButton();
 
-      gain.gain.setValueAtTime(
-        0.0001,
-        context.currentTime
+      if (
+        state.audioReady &&
+        playTest
+      ) {
+        await playBookingSound();
+      }
+
+      return (
+        state.audioReady
       );
-
-      oscillator.connect(
-        gain
-      );
-
-      gain.connect(
-        context.destination
-      );
-
-      oscillator.start(
-        context.currentTime
-      );
-
-      oscillator.stop(
-        context.currentTime +
-          0.02
-      );
-
-      notificationState.audioUnlocked =
-        true;
     } catch (error) {
       console.error(
-        "Não foi possível liberar o áudio:",
+        "Não foi possível ativar o áudio:",
         error
       );
+
+      state.audioReady =
+        false;
+
+      updateSoundButton();
+
+      return false;
     }
   }
 
   function createTone(
     context,
     frequency,
-    startTime,
+    start,
     duration,
-    volume
+    volume,
+    type = "sine"
   ) {
     const oscillator =
       context.createOscillator();
@@ -189,27 +290,27 @@
       context.createGain();
 
     oscillator.type =
-      "sine";
+      type;
 
     oscillator.frequency.setValueAtTime(
       frequency,
-      startTime
+      start
     );
 
     gain.gain.setValueAtTime(
       0.0001,
-      startTime
+      start
     );
 
     gain.gain.exponentialRampToValueAtTime(
       volume,
-      startTime +
-        0.025
+      start +
+        0.02
     );
 
     gain.gain.exponentialRampToValueAtTime(
       0.0001,
-      startTime +
+      start +
         duration
     );
 
@@ -222,11 +323,11 @@
     );
 
     oscillator.start(
-      startTime
+      start
     );
 
     oscillator.stop(
-      startTime +
+      start +
         duration +
         0.03
     );
@@ -234,65 +335,108 @@
 
   async function playBookingSound() {
     const AudioContextClass =
-      window.AudioContext ||
-      window.webkitAudioContext;
+      getAudioContextClass();
 
-    if (!AudioContextClass) {
-      return;
+    if (
+      !AudioContextClass
+    ) {
+      return false;
     }
 
     try {
       if (
-        !notificationState.audioContext
+        !state.audioContext
       ) {
-        notificationState.audioContext =
+        state.audioContext =
           new AudioContextClass();
       }
 
       const context =
-        notificationState.audioContext;
+        state.audioContext;
 
       if (
         context.state ===
         "suspended"
       ) {
-        await context.resume();
+        try {
+          await context.resume();
+        } catch (error) {
+        }
       }
+
+      if (
+        context.state !==
+        "running"
+      ) {
+        state.audioReady =
+          false;
+
+        updateSoundButton();
+
+        return false;
+      }
+
+      state.audioReady =
+        true;
+
+      updateSoundButton();
 
       const now =
         context.currentTime +
-        0.03;
+        0.04;
 
       createTone(
         context,
-        659.25,
+        523.25,
         now,
-        0.2,
-        0.075
+        0.18,
+        0.18,
+        "sine"
       );
 
       createTone(
         context,
-        880,
+        659.25,
         now +
-          0.12,
-        0.24,
-        0.085
+          0.14,
+        0.22,
+        0.2,
+        "sine"
+      );
+
+      createTone(
+        context,
+        783.99,
+        now +
+          0.3,
+        0.27,
+        0.22,
+        "sine"
       );
 
       createTone(
         context,
         1046.5,
         now +
-          0.27,
-        0.32,
-        0.095
+          0.5,
+        0.35,
+        0.23,
+        "sine"
       );
+
+      return true;
     } catch (error) {
       console.error(
-        "Não foi possível tocar a notificação:",
+        "Não foi possível tocar o aviso:",
         error
       );
+
+      state.audioReady =
+        false;
+
+      updateSoundButton();
+
+      return false;
     }
   }
 
@@ -330,7 +474,7 @@
       );
     } catch (error) {
       console.error(
-        "Não foi possível solicitar permissão de notificação:",
+        "Erro ao solicitar notificações:",
         error
       );
 
@@ -344,7 +488,9 @@
         "gng-notification-container"
       );
 
-    if (container) {
+    if (
+      container
+    ) {
       return container;
     }
 
@@ -404,19 +550,23 @@
         "div"
       );
 
-    const time =
-      normalizeTime(
-        booking.booking_time
+    const customer =
+      getCustomerLabel(
+        booking
       );
+
+    const service =
+      booking.service ||
+      "Atendimento";
 
     const date =
       formatDateShort(
         booking.booking_date
       );
 
-    const customer =
-      getCustomerLabel(
-        booking
+    const time =
+      normalizeTime(
+        booking.booking_time
       );
 
     Object.assign(
@@ -429,10 +579,10 @@
           "hidden",
 
         padding:
-          "17px 46px 17px 18px",
+          "18px 48px 18px 20px",
 
         border:
-          "1px solid rgba(34, 51, 79, 0.15)",
+          "1px solid rgba(34, 51, 79, 0.16)",
 
         borderRadius:
           "15px",
@@ -452,162 +602,96 @@
         pointerEvents:
           "auto",
 
-        transform:
-          "translateX(30px)",
+        cursor:
+          "pointer",
 
         opacity:
           "0",
 
+        transform:
+          "translateX(30px)",
+
         transition:
-          "transform .25s ease, opacity .25s ease"
+          "opacity .25s ease, transform .25s ease"
       }
     );
 
-    const accent =
-      document.createElement(
-        "div"
-      );
+    card.innerHTML =
+      `
+        <div
+          style="
+            position:absolute;
+            left:0;
+            top:0;
+            bottom:0;
+            width:5px;
+            background:#d97717;
+          "
+        ></div>
 
-    Object.assign(
-      accent.style,
-      {
-        position:
-          "absolute",
+        <span
+          style="
+            display:block;
+            color:#d97717;
+            font-size:11px;
+            font-weight:800;
+            letter-spacing:.08em;
+          "
+        >
+          ${
+            totalNew > 1
+              ? totalNew +
+                " NOVOS AGENDAMENTOS"
+              : "NOVO AGENDAMENTO"
+          }
+        </span>
 
-        top:
-          "0",
+        <strong
+          style="
+            display:block;
+            margin-top:5px;
+            color:#0d1728;
+            font-size:16px;
+            font-weight:800;
+          "
+        >
+          ${escapeHtml(
+            customer
+          )}
+        </strong>
 
-        left:
-          "0",
+        <span
+          style="
+            display:block;
+            margin-top:3px;
+            color:#354b6e;
+            font-size:13px;
+            font-weight:700;
+          "
+        >
+          ${escapeHtml(
+            service
+          )}
+        </span>
 
-        bottom:
-          "0",
-
-        width:
-          "5px",
-
-        background:
-          "#d97717"
-      }
-    );
-
-    const kicker =
-      document.createElement(
-        "span"
-      );
-
-    kicker.textContent =
-      totalNew > 1
-        ? totalNew +
-          " NOVOS AGENDAMENTOS"
-        : "NOVO AGENDAMENTO";
-
-    Object.assign(
-      kicker.style,
-      {
-        display:
-          "block",
-
-        color:
-          "#d97717",
-
-        fontSize:
-          "11px",
-
-        fontWeight:
-          "800",
-
-        letterSpacing:
-          ".08em"
-      }
-    );
-
-    const title =
-      document.createElement(
-        "strong"
-      );
-
-    title.textContent =
-      customer;
-
-    Object.assign(
-      title.style,
-      {
-        display:
-          "block",
-
-        marginTop:
-          "5px",
-
-        color:
-          "#0d1728",
-
-        fontSize:
-          "16px",
-
-        fontWeight:
-          "800"
-      }
-    );
-
-    const service =
-      document.createElement(
-        "span"
-      );
-
-    service.textContent =
-      booking.service ||
-      "Atendimento";
-
-    Object.assign(
-      service.style,
-      {
-        display:
-          "block",
-
-        marginTop:
-          "3px",
-
-        color:
-          "#354b6e",
-
-        fontSize:
-          "13px",
-
-        fontWeight:
-          "700"
-      }
-    );
-
-    const dateTime =
-      document.createElement(
-        "span"
-      );
-
-    dateTime.textContent =
-      date +
-      " • " +
-      time;
-
-    Object.assign(
-      dateTime.style,
-      {
-        display:
-          "block",
-
-        marginTop:
-          "7px",
-
-        color:
-          "#657287",
-
-        fontSize:
-          "12px",
-
-        fontWeight:
-          "600"
-      }
-    );
+        <span
+          style="
+            display:block;
+            margin-top:7px;
+            color:#657287;
+            font-size:12px;
+            font-weight:600;
+          "
+        >
+          ${escapeHtml(
+            date
+          )}
+          •
+          ${escapeHtml(
+            time
+          )}
+        </span>
+      `;
 
     const close =
       document.createElement(
@@ -642,12 +726,6 @@
 
         height:
           "30px",
-
-        display:
-          "grid",
-
-        placeItems:
-          "center",
 
         border:
           "0",
@@ -705,26 +783,6 @@
     );
 
     card.appendChild(
-      accent
-    );
-
-    card.appendChild(
-      kicker
-    );
-
-    card.appendChild(
-      title
-    );
-
-    card.appendChild(
-      service
-    );
-
-    card.appendChild(
-      dateTime
-    );
-
-    card.appendChild(
       close
     );
 
@@ -748,6 +806,32 @@
     );
   }
 
+  function escapeHtml(value) {
+    return String(
+      value ?? ""
+    )
+      .replaceAll(
+        "&",
+        "&amp;"
+      )
+      .replaceAll(
+        "<",
+        "&lt;"
+      )
+      .replaceAll(
+        ">",
+        "&gt;"
+      )
+      .replaceAll(
+        '"',
+        "&quot;"
+      )
+      .replaceAll(
+        "'",
+        "&#039;"
+      );
+  }
+
   function focusBookingInPanel(
     booking
   ) {
@@ -761,17 +845,21 @@
         '[data-admin-section="agenda"]'
       );
 
-    if (agendaButton) {
+    if (
+      agendaButton
+    ) {
       agendaButton.click();
     }
 
-    const pendingTab =
+    const pendingButton =
       document.querySelector(
         '[data-booking-view="pending"]'
       );
 
-    if (pendingTab) {
-      pendingTab.click();
+    if (
+      pendingButton
+    ) {
+      pendingButton.click();
     }
 
     const dateInput =
@@ -805,26 +893,35 @@
       !(
         "Notification" in
         window
-      ) ||
-      Notification.permission !==
-        "granted"
+      )
     ) {
       return;
     }
 
-    const time =
-      normalizeTime(
-        booking.booking_time
+    if (
+      Notification.permission !==
+      "granted"
+    ) {
+      return;
+    }
+
+    const customer =
+      getCustomerLabel(
+        booking
       );
+
+    const service =
+      booking.service ||
+      "Atendimento";
 
     const date =
       formatDateShort(
         booking.booking_date
       );
 
-    const customer =
-      getCustomerLabel(
-        booking
+    const time =
+      normalizeTime(
+        booking.booking_time
       );
 
     try {
@@ -835,11 +932,8 @@
             body:
               customer +
               "\n" +
-              (
-                booking.service ||
-                "Atendimento"
-              ) +
-              " • " +
+              service +
+              "\n" +
               date +
               " às " +
               time,
@@ -861,7 +955,7 @@
               true,
 
             silent:
-              true
+              false
           }
         );
 
@@ -875,7 +969,7 @@
         };
     } catch (error) {
       console.error(
-        "Não foi possível mostrar a notificação do navegador:",
+        "Não foi possível mostrar a notificação:",
         error
       );
     }
@@ -885,10 +979,10 @@
     count
   ) {
     if (
-      notificationState.titleTimeout
+      state.titleTimeout
     ) {
       window.clearTimeout(
-        notificationState.titleTimeout
+        state.titleTimeout
       );
     }
 
@@ -899,11 +993,14 @@
           " novos agendamentos | GNG"
         : "🔔 Novo agendamento | GNG";
 
-    notificationState.titleTimeout =
+    state.titleTimeout =
       window.setTimeout(
         function () {
           document.title =
             ORIGINAL_TITLE;
+
+          state.titleTimeout =
+            null;
         },
         20000
       );
@@ -911,13 +1008,13 @@
 
   function restorePageTitle() {
     if (
-      notificationState.titleTimeout
+      state.titleTimeout
     ) {
       window.clearTimeout(
-        notificationState.titleTimeout
+        state.titleTimeout
       );
 
-      notificationState.titleTimeout =
+      state.titleTimeout =
         null;
     }
 
@@ -925,63 +1022,52 @@
       ORIGINAL_TITLE;
   }
 
-  function showGlobalPanelMessage(
+  function showPanelMessage(
     booking,
     count
   ) {
-    const element =
+    const target =
       document.getElementById(
         "admin-global-message"
       );
 
-    if (!element) {
+    if (
+      !target
+    ) {
       return;
     }
 
-    const time =
-      normalizeTime(
-        booking.booking_time
-      );
-
-    element.hidden =
+    target.hidden =
       false;
 
-    element.classList.remove(
+    target.classList.remove(
       "is-error",
       "is-success"
     );
 
-    element.classList.add(
+    target.classList.add(
       "is-info"
     );
 
-    element.textContent =
+    if (
       count > 1
-        ? count +
-          " novos agendamentos acabaram de chegar."
-        : "Novo agendamento recebido: " +
-          (
-            booking.service ||
-            "atendimento"
-          ) +
-          " às " +
-          time +
-          ".";
-
-    window.setTimeout(
-      function () {
-        if (
-          element.textContent &&
-          element.textContent.startsWith(
-            "Novo"
-          )
-        ) {
-          element.hidden =
-            true;
-        }
-      },
-      10000
-    );
+    ) {
+      target.textContent =
+        count +
+        " novos agendamentos acabaram de chegar.";
+    } else {
+      target.textContent =
+        "Novo agendamento recebido: " +
+        (
+          booking.service ||
+          "Atendimento"
+        ) +
+        " às " +
+        normalizeTime(
+          booking.booking_time
+        ) +
+        ".";
+    }
   }
 
   async function handleNewBookings(
@@ -1000,7 +1086,7 @@
       bookings.length
     );
 
-    showGlobalPanelMessage(
+    showPanelMessage(
       bookings[0],
       bookings.length
     );
@@ -1017,13 +1103,32 @@
         );
       }
     );
+
+    window.setTimeout(
+      function () {
+        const refreshButton =
+          document.getElementById(
+            "admin-refresh-button"
+          );
+
+        if (
+          refreshButton &&
+          !refreshButton.disabled
+        ) {
+          refreshButton.click();
+        }
+      },
+      250
+    );
   }
 
-  async function fetchActivePendingBookings() {
+  async function fetchPendingBookings() {
     const client =
       getClient();
 
-    if (!client) {
+    if (
+      !client
+    ) {
       return [];
     }
 
@@ -1035,7 +1140,9 @@
         "admin_list_active_pending_bookings"
       );
 
-    if (error) {
+    if (
+      error
+    ) {
       throw error;
     }
 
@@ -1048,7 +1155,7 @@
 
   async function pollPendingBookings() {
     if (
-      notificationState.polling
+      state.polling
     ) {
       return;
     }
@@ -1056,16 +1163,19 @@
     const client =
       getClient();
 
-    if (!client) {
+    if (
+      !client
+    ) {
       return;
     }
 
-    notificationState.polling =
+    state.polling =
       true;
 
     try {
       const {
-        data: sessionData
+        data:
+          sessionData
       } =
         await client.auth.getSession();
 
@@ -1073,34 +1183,36 @@
         !sessionData ||
         !sessionData.session
       ) {
-        notificationState.baselineReady =
+        state.baselineReady =
           false;
 
-        notificationState.knownPendingIds =
+        state.knownPendingIds =
           new Set();
 
         return;
       }
 
       const bookings =
-        await fetchActivePendingBookings();
+        await fetchPendingBookings();
 
       const currentIds =
         new Set(
           bookings.map(
-            function (booking) {
+            function (
+              booking
+            ) {
               return booking.id;
             }
           )
         );
 
       if (
-        !notificationState.baselineReady
+        !state.baselineReady
       ) {
-        notificationState.knownPendingIds =
+        state.knownPendingIds =
           currentIds;
 
-        notificationState.baselineReady =
+        state.baselineReady =
           true;
 
         return;
@@ -1108,16 +1220,18 @@
 
       const newBookings =
         bookings.filter(
-          function (booking) {
+          function (
+            booking
+          ) {
             return (
-              !notificationState.knownPendingIds.has(
+              !state.knownPendingIds.has(
                 booking.id
               )
             );
           }
         );
 
-      notificationState.knownPendingIds =
+      state.knownPendingIds =
         currentIds;
 
       if (
@@ -1126,23 +1240,6 @@
       ) {
         await handleNewBookings(
           newBookings
-        );
-
-        window.setTimeout(
-          function () {
-            const refreshButton =
-              document.getElementById(
-                "admin-refresh-button"
-              );
-
-            if (
-              refreshButton &&
-              !refreshButton.disabled
-            ) {
-              refreshButton.click();
-            }
-          },
-          350
         );
       }
     } catch (error) {
@@ -1169,51 +1266,53 @@
         );
       }
     } finally {
-      notificationState.polling =
+      state.polling =
         false;
     }
   }
 
-  function stopPolling() {
-    if (
-      notificationState.intervalId
-    ) {
-      window.clearInterval(
-        notificationState.intervalId
-      );
-
-      notificationState.intervalId =
-        null;
-    }
-
-    notificationState.baselineReady =
-      false;
-
-    notificationState.knownPendingIds =
-      new Set();
-  }
-
   function startPolling() {
     if (
-      notificationState.intervalId
+      state.intervalId
     ) {
       return;
     }
 
     pollPendingBookings();
 
-    notificationState.intervalId =
+    state.intervalId =
       window.setInterval(
         pollPendingBookings,
         POLL_INTERVAL
       );
   }
 
-  async function handleSessionState() {
+  function stopPolling() {
+    if (
+      state.intervalId
+    ) {
+      window.clearInterval(
+        state.intervalId
+      );
+
+      state.intervalId =
+        null;
+    }
+
+    state.baselineReady =
+      false;
+
+    state.knownPendingIds =
+      new Set();
+  }
+
+  async function checkSession() {
     const client =
       getClient();
 
-    if (!client) {
+    if (
+      !client
+    ) {
       return;
     }
 
@@ -1233,74 +1332,18 @@
       }
     } catch (error) {
       console.error(
-        "Não foi possível iniciar as notificações:",
         error
       );
     }
   }
 
-  function setupPermissionTriggers() {
-    const loginForm =
-      document.getElementById(
-        "admin-login-form"
-      );
-
-    if (loginForm) {
-      loginForm.addEventListener(
-        "submit",
-        function () {
-          unlockAudio();
-
-          requestNotificationPermission();
-        },
-        {
-          capture:
-            true
-        }
-      );
-    }
-
-    const unlockOnInteraction =
-      function () {
-        unlockAudio();
-
-        const dashboard =
-          document.getElementById(
-            "admin-dashboard"
-          );
-
-        if (
-          dashboard &&
-          !dashboard.hidden &&
-          "Notification" in
-            window &&
-          Notification.permission ===
-            "default"
-        ) {
-          requestNotificationPermission();
-        }
-      };
-
-    document.addEventListener(
-      "pointerdown",
-      unlockOnInteraction,
-      {
-        passive:
-          true
-      }
-    );
-
-    document.addEventListener(
-      "keydown",
-      unlockOnInteraction
-    );
-  }
-
-  function setupAuthListener() {
+  function setupAuthenticationWatcher() {
     const client =
       getClient();
 
-    if (!client) {
+    if (
+      !client
+    ) {
       return;
     }
 
@@ -1310,16 +1353,17 @@
         session
       ) {
         if (
-          event ===
-            "SIGNED_IN" ||
-          event ===
-            "TOKEN_REFRESHED" ||
-          event ===
-            "INITIAL_SESSION"
+          (
+            event ===
+              "SIGNED_IN" ||
+            event ===
+              "TOKEN_REFRESHED" ||
+            event ===
+              "INITIAL_SESSION"
+          ) &&
+          session
         ) {
-          if (session) {
-            startPolling();
-          }
+          startPolling();
         }
 
         if (
@@ -1334,12 +1378,74 @@
     );
   }
 
-  function initializeNotifications() {
-    setupPermissionTriggers();
+  function setupAudioUnlock() {
+    document.addEventListener(
+      "pointerdown",
+      function () {
+        if (
+          !state.audioReady
+        ) {
+          activateAudio(
+            false
+          );
+        }
+      },
+      {
+        capture:
+          true
+      }
+    );
 
-    setupAuthListener();
+    document.addEventListener(
+      "keydown",
+      function () {
+        if (
+          !state.audioReady
+        ) {
+          activateAudio(
+            false
+          );
+        }
+      },
+      {
+        capture:
+          true
+      }
+    );
 
-    handleSessionState();
+    const loginForm =
+      document.getElementById(
+        "admin-login-form"
+      );
+
+    if (
+      loginForm
+    ) {
+      loginForm.addEventListener(
+        "submit",
+        function () {
+          activateAudio(
+            false
+          );
+
+          requestNotificationPermission();
+        },
+        {
+          capture:
+            true
+        }
+      );
+    }
+  }
+
+  function initialize() {
+    createSoundButton();
+
+    setupAudioUnlock();
+
+    setupAuthenticationWatcher();
+
+    checkSession();
 
     window.addEventListener(
       "focus",
@@ -1358,9 +1464,9 @@
   ) {
     document.addEventListener(
       "DOMContentLoaded",
-      initializeNotifications
+      initialize
     );
   } else {
-    initializeNotifications();
+    initialize();
   }
 })();
