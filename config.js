@@ -154,6 +154,43 @@ function isConfiguredAdminEmail(email) {
   );
 }
 
+function loadAdminNotifications() {
+  if (
+    document.querySelector(
+      'script[data-gng-admin-notifications="true"]'
+    )
+  ) {
+    return;
+  }
+
+  const script =
+    document.createElement(
+      "script"
+    );
+
+  script.src =
+    "admin-notifications.js?v=1.0";
+
+  script.async =
+    true;
+
+  script.dataset.gngAdminNotifications =
+    "true";
+
+  script.addEventListener(
+    "error",
+    function () {
+      console.error(
+        "Não foi possível carregar o sistema de notificações."
+      );
+    }
+  );
+
+  document.head.appendChild(
+    script
+  );
+}
+
 window.GNG_CONFIG = {
   supabaseUrl:
     SUPABASE_URL,
@@ -235,6 +272,8 @@ if (
           }
         }
       );
+
+    loadAdminNotifications();
   } catch (error) {
     console.error(
       "Erro ao iniciar Supabase:",
