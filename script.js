@@ -43,7 +43,8 @@ let blockedSlots = new Map();
 let bookingRequestInProgress = false;
 
 if (year) {
-  year.textContent = new Date().getFullYear();
+  year.textContent =
+    new Date().getFullYear();
 }
 
 function closeMenu() {
@@ -155,7 +156,9 @@ function setupMenu() {
   window.addEventListener(
     "resize",
     function () {
-      if (window.innerWidth > 860) {
+      if (
+        window.innerWidth > 860
+      ) {
         closeMenu();
       }
     }
@@ -167,13 +170,20 @@ function getBusinessDateParts() {
     new Intl.DateTimeFormat(
       "en-CA",
       {
-        timeZone: BUSINESS_TIMEZONE,
-        year: "numeric",
-        month: "2-digit",
-        day: "2-digit",
-        hour: "2-digit",
-        minute: "2-digit",
-        hourCycle: "h23"
+        timeZone:
+          BUSINESS_TIMEZONE,
+        year:
+          "numeric",
+        month:
+          "2-digit",
+        day:
+          "2-digit",
+        hour:
+          "2-digit",
+        minute:
+          "2-digit",
+        hourCycle:
+          "h23"
       }
     );
 
@@ -184,24 +194,48 @@ function getBusinessDateParts() {
 
   const result = {};
 
-  parts.forEach(function (part) {
-    if (part.type !== "literal") {
-      result[part.type] =
-        part.value;
+  parts.forEach(
+    function (part) {
+      if (
+        part.type !==
+        "literal"
+      ) {
+        result[
+          part.type
+        ] =
+          part.value;
+      }
     }
-  });
+  );
 
   return {
-    year: Number(result.year),
-    month: Number(result.month),
-    day: Number(result.day),
-    hour: Number(result.hour),
-    minute: Number(result.minute)
+    year:
+      Number(
+        result.year
+      ),
+    month:
+      Number(
+        result.month
+      ),
+    day:
+      Number(
+        result.day
+      ),
+    hour:
+      Number(
+        result.hour
+      ),
+    minute:
+      Number(
+        result.minute
+      )
   };
 }
 
 function padNumber(value) {
-  return String(value).padStart(
+  return String(
+    value
+  ).padStart(
     2,
     "0"
   );
@@ -215,9 +249,13 @@ function buildDateKey(
   return (
     yearValue +
     "-" +
-    padNumber(monthValue) +
+    padNumber(
+      monthValue
+    ) +
     "-" +
-    padNumber(dayValue)
+    padNumber(
+      dayValue
+    )
   );
 }
 
@@ -238,12 +276,18 @@ function createUtcDate(
   );
 }
 
-function addDays(date, amount) {
+function addDays(
+  date,
+  amount
+) {
   const result =
-    new Date(date.getTime());
+    new Date(
+      date.getTime()
+    );
 
   result.setUTCDate(
-    result.getUTCDate() + amount
+    result.getUTCDate() +
+      amount
   );
 
   return result;
@@ -261,37 +305,54 @@ function formatWeekday(date) {
   return new Intl.DateTimeFormat(
     "pt-BR",
     {
-      weekday: "short",
-      timeZone: "UTC"
+      weekday:
+        "short",
+      timeZone:
+        "UTC"
     }
   )
     .format(date)
-    .replace(".", "");
+    .replace(
+      ".",
+      ""
+    );
 }
 
 function formatMonth(date) {
   return new Intl.DateTimeFormat(
     "pt-BR",
     {
-      month: "short",
-      timeZone: "UTC"
+      month:
+        "short",
+      timeZone:
+        "UTC"
     }
   )
     .format(date)
-    .replace(".", "");
+    .replace(
+      ".",
+      ""
+    );
 }
 
 function formatFullDate(date) {
   return new Intl.DateTimeFormat(
     "pt-BR",
     {
-      weekday: "long",
-      day: "2-digit",
-      month: "long",
-      year: "numeric",
-      timeZone: "UTC"
+      weekday:
+        "long",
+      day:
+        "2-digit",
+      month:
+        "long",
+      year:
+        "numeric",
+      timeZone:
+        "UTC"
     }
-  ).format(date);
+  ).format(
+    date
+  );
 }
 
 function capitalizeFirst(value) {
@@ -300,7 +361,9 @@ function capitalizeFirst(value) {
   }
 
   return (
-    value.charAt(0).toUpperCase() +
+    value
+      .charAt(0)
+      .toUpperCase() +
     value.slice(1)
   );
 }
@@ -332,7 +395,8 @@ function getCurrentMinutes() {
     getBusinessDateParts();
 
   return (
-    now.hour * 60 +
+    now.hour *
+      60 +
     now.minute
   );
 }
@@ -342,11 +406,17 @@ function timeToMinutes(time) {
     return 0;
   }
 
-  const parts = time.split(":");
+  const parts =
+    time.split(":");
 
   return (
-    Number(parts[0]) * 60 +
-    Number(parts[1])
+    Number(
+      parts[0]
+    ) *
+      60 +
+    Number(
+      parts[1]
+    )
   );
 }
 
@@ -355,7 +425,9 @@ function normalizeDatabaseTime(time) {
     return "";
   }
 
-  return String(time).slice(
+  return String(
+    time
+  ).slice(
     0,
     5
   );
@@ -365,11 +437,13 @@ function generateSlots() {
   const slots = [];
 
   const start =
-    SLOT_START_HOUR * 60 +
+    SLOT_START_HOUR *
+      60 +
     SLOT_START_MINUTE;
 
   const end =
-    SLOT_END_HOUR * 60 +
+    SLOT_END_HOUR *
+      60 +
     SLOT_END_MINUTE;
 
   for (
@@ -378,16 +452,23 @@ function generateSlots() {
     minutes += SLOT_INTERVAL
   ) {
     const hour =
-      Math.floor(minutes / 60);
+      Math.floor(
+        minutes / 60
+      );
 
     const minute =
-      minutes % 60;
+      minutes %
+      60;
 
     slots.push({
       value:
-        padNumber(hour) +
+        padNumber(
+          hour
+        ) +
         ":" +
-        padNumber(minute),
+        padNumber(
+          minute
+        ),
       minutes
     });
   }
@@ -405,7 +486,8 @@ async function supabaseRpc(
         "/rest/v1/rpc/" +
         functionName,
       {
-        method: "POST",
+        method:
+          "POST",
 
         headers: {
           "Content-Type":
@@ -420,7 +502,9 @@ async function supabaseRpc(
         },
 
         body:
-          JSON.stringify(payload)
+          JSON.stringify(
+            payload
+          )
       }
     );
 
@@ -450,27 +534,36 @@ async function supabaseRpc(
 
     if (
       data &&
-      typeof data === "object" &&
+      typeof data ===
+        "object" &&
       data.message
     ) {
-      message = data.message;
+      message =
+        data.message;
     }
 
-    throw new Error(message);
+    throw new Error(
+      message
+    );
   }
 
   return data;
 }
 
 function clearBlockedSlots() {
-  blockedSlots = new Map();
+  blockedSlots =
+    new Map();
 }
 
 function addBlockedSlot(
   date,
   time
 ) {
-  if (!blockedSlots.has(date)) {
+  if (
+    !blockedSlots.has(
+      date
+    )
+  ) {
     blockedSlots.set(
       date,
       new Set()
@@ -478,21 +571,33 @@ function addBlockedSlot(
   }
 
   blockedSlots
-    .get(date)
-    .add(time);
+    .get(
+      date
+    )
+    .add(
+      time
+    );
 }
 
 function isSlotBlocked(
   date,
   time
 ) {
-  if (!blockedSlots.has(date)) {
+  if (
+    !blockedSlots.has(
+      date
+    )
+  ) {
     return false;
   }
 
   return blockedSlots
-    .get(date)
-    .has(time);
+    .get(
+      date
+    )
+    .has(
+      time
+    );
 }
 
 function hasAvailableTime(
@@ -534,7 +639,8 @@ async function loadBookedSlots() {
     const finalDate =
       addDays(
         today,
-        BOOKING_DAYS_COUNT - 1
+        BOOKING_DAYS_COUNT -
+          1
       );
 
     const data =
@@ -542,18 +648,28 @@ async function loadBookedSlots() {
         "get_public_booked_slots",
         {
           p_start_date:
-            dateToKey(today),
+            dateToKey(
+              today
+            ),
 
           p_end_date:
-            dateToKey(finalDate)
+            dateToKey(
+              finalDate
+            )
         }
       );
 
     clearBlockedSlots();
 
-    if (Array.isArray(data)) {
+    if (
+      Array.isArray(
+        data
+      )
+    ) {
       data.forEach(
-        function (booking) {
+        function (
+          booking
+        ) {
           addBlockedSlot(
             booking.booking_date,
             normalizeDatabaseTime(
@@ -569,7 +685,9 @@ async function loadBookedSlots() {
       selectedTime
     ) {
       const selectedKey =
-        dateToKey(selectedDate);
+        dateToKey(
+          selectedDate
+        );
 
       if (
         isSlotBlocked(
@@ -577,7 +695,8 @@ async function loadBookedSlots() {
           selectedTime
         )
       ) {
-        selectedTime = null;
+        selectedTime =
+          null;
 
         updateTimeSummary();
       }
@@ -594,7 +713,9 @@ async function loadBookedSlots() {
 }
 
 function updateServiceSummary() {
-  if (!bookingService) {
+  if (
+    !bookingService
+  ) {
     return;
   }
 
@@ -608,25 +729,35 @@ function updateServiceSummary() {
 
   const price =
     option
-      ? option.dataset.price || ""
+      ? option.dataset.price ||
+        ""
       : "";
 
-  if (summaryService) {
+  if (
+    summaryService
+  ) {
     summaryService.textContent =
       service ||
       "Não selecionado";
   }
 
-  if (summaryPrice) {
+  if (
+    summaryPrice
+  ) {
     summaryPrice.textContent =
-      price || "—";
+      price ||
+      "—";
   }
 
   updateSubmitState();
 }
 
-function updateDateSummary(date) {
-  if (!summaryDate) {
+function updateDateSummary(
+  date
+) {
+  if (
+    !summaryDate
+  ) {
     return;
   }
 
@@ -639,12 +770,16 @@ function updateDateSummary(date) {
 
   summaryDate.textContent =
     capitalizeFirst(
-      formatFullDate(date)
+      formatFullDate(
+        date
+      )
     );
 }
 
 function updateTimeSummary() {
-  if (!summaryTime) {
+  if (
+    !summaryTime
+  ) {
     return;
   }
 
@@ -663,7 +798,9 @@ function updateSubmitState() {
 
   const dateKey =
     selectedDate
-      ? dateToKey(selectedDate)
+      ? dateToKey(
+          selectedDate
+        )
       : null;
 
   const occupied =
@@ -684,38 +821,51 @@ function updateSubmitState() {
 }
 
 function renderDays() {
-  if (!bookingDays) {
+  if (
+    !bookingDays
+  ) {
     return;
   }
 
-  bookingDays.innerHTML = "";
+  bookingDays.innerHTML =
+    "";
 
   const today =
     getTodayDate();
 
   const todayKey =
-    dateToKey(today);
+    dateToKey(
+      today
+    );
 
   let firstAvailableDate =
     null;
 
   for (
     let index = 0;
-    index < BOOKING_DAYS_COUNT;
+    index <
+      BOOKING_DAYS_COUNT;
     index += 1
   ) {
     const date =
-      addDays(today, index);
+      addDays(
+        today,
+        index
+      );
 
     const dateKey =
-      dateToKey(date);
+      dateToKey(
+        date
+      );
 
     const button =
       document.createElement(
         "button"
       );
 
-    button.type = "button";
+    button.type =
+      "button";
+
     button.className =
       "booking-day";
 
@@ -724,7 +874,9 @@ function renderDays() {
 
     button.innerHTML =
       "<span>" +
-      formatWeekday(date) +
+      formatWeekday(
+        date
+      ) +
       "</span>" +
       "<strong>" +
       padNumber(
@@ -732,10 +884,15 @@ function renderDays() {
       ) +
       "</strong>" +
       "<small>" +
-      formatMonth(date) +
+      formatMonth(
+        date
+      ) +
       "</small>";
 
-    if (dateKey === todayKey) {
+    if (
+      dateKey ===
+      todayKey
+    ) {
       button.classList.add(
         "is-today"
       );
@@ -743,7 +900,9 @@ function renderDays() {
 
     if (
       !firstAvailableDate &&
-      hasAvailableTime(dateKey)
+      hasAvailableTime(
+        dateKey
+      )
     ) {
       firstAvailableDate =
         date;
@@ -752,7 +911,9 @@ function renderDays() {
     button.addEventListener(
       "click",
       function () {
-        selectDate(date);
+        selectDate(
+          date
+        );
       }
     );
 
@@ -761,21 +922,30 @@ function renderDays() {
     );
   }
 
-  if (firstAvailableDate) {
+  if (
+    firstAvailableDate
+  ) {
     selectDate(
       firstAvailableDate
     );
   }
 }
 
-function selectDate(date) {
+function selectDate(
+  date
+) {
   selectedDate =
-    new Date(date.getTime());
+    new Date(
+      date.getTime()
+    );
 
-  selectedTime = null;
+  selectedTime =
+    null;
 
   const selectedKey =
-    dateToKey(selectedDate);
+    dateToKey(
+      selectedDate
+    );
 
   const buttons =
     bookingDays
@@ -787,7 +957,9 @@ function selectDate(date) {
       : [];
 
   buttons.forEach(
-    function (button) {
+    function (
+      button
+    ) {
       const active =
         button.dataset.date ===
         selectedKey;
@@ -811,7 +983,9 @@ function selectDate(date) {
   );
 
   updateTimeSummary();
+
   renderTimes();
+
   updateSubmitState();
 }
 
@@ -823,10 +997,13 @@ function renderTimes() {
     return;
   }
 
-  bookingTimes.innerHTML = "";
+  bookingTimes.innerHTML =
+    "";
 
   const selectedKey =
-    dateToKey(selectedDate);
+    dateToKey(
+      selectedDate
+    );
 
   const todayKey =
     getTodayKey();
@@ -838,13 +1015,16 @@ function renderTimes() {
     generateSlots();
 
   slots.forEach(
-    function (slot) {
+    function (
+      slot
+    ) {
       const button =
         document.createElement(
           "button"
         );
 
-      button.type = "button";
+      button.type =
+        "button";
 
       button.className =
         "booking-time";
@@ -864,12 +1044,17 @@ function renderTimes() {
           slot.value
         );
 
-      if (occupied) {
+      if (
+        occupied
+      ) {
         button.innerHTML =
-          "<strong>X</strong>" +
-          "<span>ocupado</span>";
+          '<span class="booking-time-value">' +
+          slot.value +
+          "</span>" +
+          '<span class="booking-time-status">Ocupado</span>';
 
-        button.disabled = true;
+        button.disabled =
+          true;
 
         button.classList.add(
           "is-disabled",
@@ -885,11 +1070,14 @@ function renderTimes() {
         button.title =
           slot.value +
           " — horário ocupado";
-      } else if (passed) {
+      } else if (
+        passed
+      ) {
         button.textContent =
           slot.value;
 
-        button.disabled = true;
+        button.disabled =
+          true;
 
         button.classList.add(
           "is-disabled"
@@ -951,12 +1139,16 @@ function selectTime(
   time,
   button
 ) {
-  if (!selectedDate) {
+  if (
+    !selectedDate
+  ) {
     return;
   }
 
   const dateKey =
-    dateToKey(selectedDate);
+    dateToKey(
+      selectedDate
+    );
 
   if (
     isSlotBlocked(
@@ -967,7 +1159,8 @@ function selectTime(
     return;
   }
 
-  selectedTime = time;
+  selectedTime =
+    time;
 
   const buttons =
     bookingTimes
@@ -979,9 +1172,12 @@ function selectTime(
       : [];
 
   buttons.forEach(
-    function (item) {
+    function (
+      item
+    ) {
       const active =
-        item === button;
+        item ===
+        button;
 
       item.classList.toggle(
         "is-selected",
@@ -998,22 +1194,28 @@ function selectTime(
   );
 
   updateTimeSummary();
+
   updateSubmitState();
 }
 
 function findServiceOption(
   service
 ) {
-  if (!bookingService) {
+  if (
+    !bookingService
+  ) {
     return null;
   }
 
   return Array.from(
     bookingService.options
   ).find(
-    function (option) {
+    function (
+      option
+    ) {
       return (
-        option.value === service
+        option.value ===
+        service
       );
     }
   );
@@ -1022,12 +1224,16 @@ function findServiceOption(
 function selectServiceFromLink(
   service
 ) {
-  if (!bookingService) {
+  if (
+    !bookingService
+  ) {
     return;
   }
 
   const option =
-    findServiceOption(service);
+    findServiceOption(
+      service
+    );
 
   if (!option) {
     return;
@@ -1041,14 +1247,18 @@ function selectServiceFromLink(
 
 function setupServiceLinks() {
   serviceLinks.forEach(
-    function (link) {
+    function (
+      link
+    ) {
       link.addEventListener(
         "click",
         function () {
           const service =
             link.dataset.serviceLink;
 
-          if (service) {
+          if (
+            service
+          ) {
             selectServiceFromLink(
               service
             );
@@ -1078,7 +1288,8 @@ function buildWhatsappMessage() {
 
   const price =
     option
-      ? option.dataset.price || ""
+      ? option.dataset.price ||
+        ""
       : "";
 
   const dateText =
@@ -1125,15 +1336,21 @@ function prepareWhatsappWindow() {
       "_blank"
     );
 
-  if (newWindow) {
+  if (
+    newWindow
+  ) {
     try {
       newWindow.document.title =
         "Abrindo WhatsApp...";
 
       newWindow.document.body.innerHTML =
-        "<div style=\"font-family:Arial,sans-serif;padding:40px;text-align:center;color:#17243a\"><strong>Aguarde...</strong><p>Estamos confirmando seu horário e abrindo o WhatsApp.</p></div>";
-    } catch (error) {
-      console.error(error);
+        '<div style="font-family:Arial,sans-serif;padding:40px;text-align:center;color:#17243a"><strong>Aguarde...</strong><p>Estamos confirmando seu horário e abrindo o WhatsApp.</p></div>';
+    } catch (
+      error
+    ) {
+      console.error(
+        error
+      );
     }
   }
 
@@ -1146,28 +1363,42 @@ function sendWhatsappToWindow(
   const url =
     buildWhatsappUrl();
 
-  if (preparedWindow) {
+  if (
+    preparedWindow
+  ) {
     preparedWindow.location.href =
       url;
 
     try {
       preparedWindow.focus();
-    } catch (error) {
-      console.error(error);
+    } catch (
+      error
+    ) {
+      console.error(
+        error
+      );
     }
 
     return true;
   }
 
   const link =
-    document.createElement("a");
+    document.createElement(
+      "a"
+    );
 
-  link.href = url;
-  link.target = "_blank";
+  link.href =
+    url;
+
+  link.target =
+    "_blank";
+
   link.rel =
     "noopener noreferrer";
 
-  document.body.appendChild(link);
+  document.body.appendChild(
+    link
+  );
 
   link.click();
 
@@ -1188,7 +1419,9 @@ async function submitBooking() {
   }
 
   const bookingDate =
-    dateToKey(selectedDate);
+    dateToKey(
+      selectedDate
+    );
 
   if (
     isSlotBlocked(
@@ -1216,8 +1449,11 @@ async function submitBooking() {
       ? bookingSubmit.textContent
       : "";
 
-  if (bookingSubmit) {
-    bookingSubmit.disabled = true;
+  if (
+    bookingSubmit
+  ) {
+    bookingSubmit.disabled =
+      true;
 
     bookingSubmit.textContent =
       "Reservando horário...";
@@ -1252,7 +1488,8 @@ async function submitBooking() {
       whatsappWindow
     );
 
-    selectedTime = null;
+    selectedTime =
+      null;
 
     updateTimeSummary();
 
@@ -1264,7 +1501,9 @@ async function submitBooking() {
       },
       1200
     );
-  } catch (error) {
+  } catch (
+    error
+  ) {
     if (
       whatsappWindow &&
       !whatsappWindow.closed
@@ -1285,15 +1524,19 @@ async function submitBooking() {
         "\n\nEscolha outro horário e tente novamente."
     );
 
-    selectedTime = null;
+    selectedTime =
+      null;
 
     updateTimeSummary();
+
     renderTimes();
   } finally {
     bookingRequestInProgress =
       false;
 
-    if (bookingSubmit) {
+    if (
+      bookingSubmit
+    ) {
       bookingSubmit.textContent =
         originalText ||
         "Confirmar pelo WhatsApp";
@@ -1317,7 +1560,9 @@ async function setupBooking() {
     updateServiceSummary
   );
 
-  if (bookingSubmit) {
+  if (
+    bookingSubmit
+  ) {
     bookingSubmit.addEventListener(
       "click",
       submitBooking
@@ -1327,11 +1572,13 @@ async function setupBooking() {
   setupServiceLinks();
 
   updateServiceSummary();
+
   updateTimeSummary();
 
   await loadBookedSlots();
 
   renderDays();
+
   updateSubmitState();
 }
 
@@ -1344,10 +1591,14 @@ function setupInternalLinks() {
     );
 
   links.forEach(
-    function (link) {
+    function (
+      link
+    ) {
       link.addEventListener(
         "click",
-        function (event) {
+        function (
+          event
+        ) {
           const href =
             link.getAttribute(
               "href"
@@ -1365,7 +1616,9 @@ function setupInternalLinks() {
               href
             );
 
-          if (!target) {
+          if (
+            !target
+          ) {
             return;
           }
 
@@ -1381,7 +1634,8 @@ function setupInternalLinks() {
                 ? "auto"
                 : "smooth",
 
-            block: "start"
+            block:
+              "start"
           });
         }
       );
@@ -1395,7 +1649,9 @@ function refreshCurrentDayState() {
     selectedTime
   ) {
     const selectedKey =
-      dateToKey(selectedDate);
+      dateToKey(
+        selectedDate
+      );
 
     if (
       selectedKey ===
@@ -1405,19 +1661,23 @@ function refreshCurrentDayState() {
       ) <=
         getCurrentMinutes()
     ) {
-      selectedTime = null;
+      selectedTime =
+        null;
 
       updateTimeSummary();
     }
   }
 
   renderTimes();
+
   updateSubmitState();
 }
 
 function initializeSite() {
   setupMenu();
+
   setupInternalLinks();
+
   setupBooking();
 
   window.setInterval(
