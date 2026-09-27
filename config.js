@@ -19,7 +19,8 @@ function showStartupError(message) {
     return;
   }
 
-  target.hidden = false;
+  target.hidden =
+    false;
 
   target.textContent =
     message;
@@ -169,7 +170,7 @@ function loadAdminNotifications() {
     );
 
   script.src =
-    "admin-notifications.js?v=1.0";
+    "admin-notifications.js?v=2.0";
 
   script.async =
     true;
