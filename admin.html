@@ -1,0 +1,1690 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, viewport-fit=cover"
+  >
+
+  <meta
+    name="robots"
+    content="noindex,nofollow"
+  >
+
+  <meta
+    name="theme-color"
+    content="#17243a"
+  >
+
+  <meta
+    name="color-scheme"
+    content="light"
+  >
+
+  <meta
+    name="format-detection"
+    content="telephone=no"
+  >
+
+  <meta
+    name="mobile-web-app-capable"
+    content="yes"
+  >
+
+  <meta
+    name="apple-mobile-web-app-capable"
+    content="yes"
+  >
+
+  <meta
+    name="apple-mobile-web-app-status-bar-style"
+    content="default"
+  >
+
+  <title>
+    Painel Administrativo | GNG Barbearia
+  </title>
+
+  <link
+    rel="icon"
+    type="image/jpeg"
+    href="assets/logo-gng.jpg"
+  >
+
+  <link
+    rel="apple-touch-icon"
+    href="assets/logo-gng.jpg"
+  >
+
+  <link
+    rel="preconnect"
+    href="https://fonts.googleapis.com"
+  >
+
+  <link
+    rel="preconnect"
+    href="https://fonts.gstatic.com"
+    crossorigin
+  >
+
+  <link
+    rel="preconnect"
+    href="https://cdn.jsdelivr.net"
+    crossorigin
+  >
+
+  <link
+    rel="preconnect"
+    href="https://ueqfokfnjsjgocotvdae.supabase.co"
+    crossorigin
+  >
+
+  <link
+    href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet"
+  >
+
+  <link
+    rel="stylesheet"
+    href="admin.css?v=1.0"
+  >
+</head>
+
+<body>
+
+  <div class="admin-page">
+
+    <section
+      class="admin-login"
+      id="admin-login"
+    >
+
+      <div class="login-shell">
+
+        <div class="login-brand-panel">
+
+          <div class="login-logo-box">
+
+            <img
+              src="assets/logo-gng.jpg"
+              alt="GNG Barbearia"
+              width="140"
+              height="110"
+            >
+
+          </div>
+
+          <span class="login-kicker">
+            ÁREA RESTRITA
+          </span>
+
+          <h1>
+            PAINEL
+            <b>GNG BARBEARIA</b>
+          </h1>
+
+          <p>
+            Gerencie os agendamentos, confirme atendimentos,
+            acompanhe horários e controle o caixa da barbearia.
+          </p>
+
+          <div class="login-feature-list">
+
+            <div>
+              <span>01</span>
+
+              <div>
+                <strong>
+                  Agenda em tempo real
+                </strong>
+
+                <small>
+                  Aceite, recuse e acompanhe os atendimentos.
+                </small>
+              </div>
+            </div>
+
+            <div>
+              <span>02</span>
+
+              <div>
+                <strong>
+                  Controle financeiro
+                </strong>
+
+                <small>
+                  Acompanhe pagamentos e faturamento.
+                </small>
+              </div>
+            </div>
+
+            <div>
+              <span>03</span>
+
+              <div>
+                <strong>
+                  Gestão completa
+                </strong>
+
+                <small>
+                  Bloqueie horários e crie agendamentos manualmente.
+                </small>
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+
+        <div class="login-card">
+
+          <div class="login-card-head">
+
+            <span>
+              ADMINISTRAÇÃO
+            </span>
+
+            <h2>
+              Entrar no painel
+            </h2>
+
+            <p>
+              Utilize sua conta administrativa autorizada.
+            </p>
+
+          </div>
+
+          <form
+            class="login-form"
+            id="admin-login-form"
+          >
+
+            <div class="admin-field">
+
+              <label for="admin-email">
+                E-mail
+              </label>
+
+              <input
+                id="admin-email"
+                name="email"
+                type="email"
+                autocomplete="email"
+                autocapitalize="none"
+                autocorrect="off"
+                spellcheck="false"
+                inputmode="email"
+                placeholder="vyzo.studiodesign@gmail.com"
+                required
+              >
+
+            </div>
+
+            <div class="admin-field">
+
+              <label for="admin-password">
+                Senha
+              </label>
+
+              <div class="password-field">
+
+                <input
+                  id="admin-password"
+                  name="password"
+                  type="password"
+                  autocomplete="current-password"
+                  autocapitalize="none"
+                  autocorrect="off"
+                  spellcheck="false"
+                  placeholder="Digite sua senha"
+                  required
+                >
+
+                <button
+                  class="password-toggle"
+                  id="password-toggle"
+                  type="button"
+                  aria-label="Mostrar senha"
+                >
+                  MOSTRAR
+                </button>
+
+              </div>
+
+            </div>
+
+            <div
+              class="admin-message"
+              id="login-message"
+              hidden
+              role="status"
+              aria-live="polite"
+            ></div>
+
+            <button
+              class="admin-primary-button"
+              id="admin-login-button"
+              type="submit"
+            >
+              ENTRAR NO PAINEL
+            </button>
+
+          </form>
+
+          <a
+            class="back-site-link"
+            href="index.html"
+          >
+            ← VOLTAR PARA O SITE
+          </a>
+
+        </div>
+
+      </div>
+
+    </section>
+
+    <section
+      class="admin-dashboard"
+      id="admin-dashboard"
+      hidden
+    >
+
+      <header class="admin-header">
+
+        <div class="admin-header-inner">
+
+          <div class="admin-header-brand">
+
+            <img
+              src="assets/logo-gng.jpg"
+              alt="GNG Barbearia"
+              width="76"
+              height="62"
+            >
+
+            <div>
+
+              <span>
+                GNG BARBEARIA
+              </span>
+
+              <strong>
+                Gestão Administrativa
+              </strong>
+
+            </div>
+
+          </div>
+
+          <div class="admin-header-actions">
+
+            <span
+              class="admin-user-email"
+              id="admin-user-email"
+            ></span>
+
+            <a
+              class="admin-secondary-button"
+              href="index.html"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              VER SITE
+            </a>
+
+            <button
+              class="admin-secondary-button"
+              id="admin-logout-button"
+              type="button"
+            >
+              SAIR
+            </button>
+
+          </div>
+
+        </div>
+
+      </header>
+
+      <main class="admin-main">
+
+        <section class="admin-welcome">
+
+          <div>
+
+            <span>
+              CONTROLE ADMINISTRATIVO
+            </span>
+
+            <h1>
+              PAINEL
+              <b>GNG BARBEARIA</b>
+            </h1>
+
+            <p>
+              Acompanhe os agendamentos, controle os horários,
+              finalize atendimentos e gerencie o caixa.
+            </p>
+
+          </div>
+
+          <button
+            class="admin-refresh-button"
+            id="admin-refresh-button"
+            type="button"
+          >
+            ATUALIZAR PAINEL
+          </button>
+
+        </section>
+
+        <section
+          class="admin-stats"
+          aria-label="Resumo da barbearia"
+        >
+
+          <article class="admin-stat-card">
+
+            <span>
+              PENDENTES
+            </span>
+
+            <strong id="stat-pending">
+              0
+            </strong>
+
+            <small>
+              aguardando confirmação
+            </small>
+
+          </article>
+
+          <article class="admin-stat-card">
+
+            <span>
+              CONFIRMADOS
+            </span>
+
+            <strong id="stat-confirmed">
+              0
+            </strong>
+
+            <small>
+              atendimentos agendados
+            </small>
+
+          </article>
+
+          <article class="admin-stat-card">
+
+            <span>
+              HOJE
+            </span>
+
+            <strong id="stat-today">
+              0
+            </strong>
+
+            <small>
+              atendimentos do dia
+            </small>
+
+          </article>
+
+          <article class="admin-stat-card">
+
+            <span>
+              RECEBIDO HOJE
+            </span>
+
+            <strong id="stat-received-today">
+              R$ 0,00
+            </strong>
+
+            <small>
+              faturamento confirmado
+            </small>
+
+          </article>
+
+        </section>
+
+        <nav
+          class="admin-section-nav"
+          aria-label="Áreas administrativas"
+        >
+
+          <button
+            class="admin-section-nav-button is-active"
+            type="button"
+            data-admin-section="agenda"
+          >
+            AGENDA
+          </button>
+
+          <button
+            class="admin-section-nav-button"
+            type="button"
+            data-admin-section="gestao"
+          >
+            GESTÃO
+          </button>
+
+          <button
+            class="admin-section-nav-button"
+            type="button"
+            data-admin-section="caixa"
+          >
+            CAIXA
+          </button>
+
+        </nav>
+
+        <section
+          class="admin-panel-section is-active"
+          id="admin-section-agenda"
+          data-admin-panel="agenda"
+        >
+
+          <section
+            class="admin-booking-workspace"
+            aria-labelledby="booking-workspace-title"
+          >
+
+            <div class="admin-booking-workspace-head">
+
+              <div>
+
+                <span>
+                  AGENDA
+                </span>
+
+                <h2 id="booking-workspace-title">
+                  ATENDIMENTOS
+                </h2>
+
+              </div>
+
+              <div class="admin-selected-day">
+
+                <small>
+                  DATA SELECIONADA
+                </small>
+
+                <strong id="admin-selected-day-label">
+                  CARREGANDO...
+                </strong>
+
+              </div>
+
+            </div>
+
+            <div
+              class="admin-booking-tabs"
+              role="tablist"
+              aria-label="Situação dos agendamentos"
+            >
+
+              <button
+                class="admin-booking-tab is-active"
+                id="booking-tab-pending"
+                type="button"
+                role="tab"
+                aria-selected="true"
+                data-booking-view="pending"
+              >
+
+                <span class="admin-booking-tab-label">
+                  PENDENTES
+                </span>
+
+                <small>
+                  limite de 5 minutos
+                </small>
+
+                <strong id="booking-tab-pending-count">
+                  0
+                </strong>
+
+              </button>
+
+              <button
+                class="admin-booking-tab"
+                id="booking-tab-scheduled"
+                type="button"
+                role="tab"
+                aria-selected="false"
+                data-booking-view="scheduled"
+              >
+
+                <span class="admin-booking-tab-label">
+                  AGENDADOS
+                </span>
+
+                <small>
+                  confirmados e em aberto
+                </small>
+
+                <strong id="booking-tab-scheduled-count">
+                  0
+                </strong>
+
+              </button>
+
+              <button
+                class="admin-booking-tab"
+                id="booking-tab-finalized"
+                type="button"
+                role="tab"
+                aria-selected="false"
+                data-booking-view="finalized"
+              >
+
+                <span class="admin-booking-tab-label">
+                  FINALIZADOS
+                </span>
+
+                <small>
+                  atendimentos concluídos
+                </small>
+
+                <strong id="booking-tab-finalized-count">
+                  0
+                </strong>
+
+              </button>
+
+              <button
+                class="admin-booking-tab"
+                id="booking-tab-history"
+                type="button"
+                role="tab"
+                aria-selected="false"
+                data-booking-view="history"
+              >
+
+                <span class="admin-booking-tab-label">
+                  HISTÓRICO
+                </span>
+
+                <small>
+                  cancelados e expirados
+                </small>
+
+                <strong id="booking-tab-history-count">
+                  0
+                </strong>
+
+              </button>
+
+            </div>
+
+          </section>
+
+          <section class="admin-controls">
+
+            <div class="admin-control admin-control-date">
+
+              <label for="admin-date-filter">
+                Dia da agenda
+              </label>
+
+              <input
+                id="admin-date-filter"
+                type="date"
+              >
+
+            </div>
+
+            <div class="admin-control admin-control-search">
+
+              <label for="admin-search">
+                Buscar
+              </label>
+
+              <input
+                id="admin-search"
+                type="search"
+                placeholder="Nome, telefone ou serviço"
+                autocomplete="off"
+                autocapitalize="none"
+                autocorrect="off"
+                spellcheck="false"
+              >
+
+            </div>
+
+            <button
+              class="clear-filters-button"
+              id="clear-filters-button"
+              type="button"
+            >
+              LIMPAR BUSCA
+            </button>
+
+          </section>
+
+          <div
+            class="admin-global-message"
+            id="admin-global-message"
+            hidden
+            role="status"
+            aria-live="polite"
+          ></div>
+
+          <section
+            class="admin-bookings-section"
+            aria-labelledby="admin-bookings-title"
+          >
+
+            <div class="admin-section-head">
+
+              <div>
+
+                <span id="admin-bookings-kicker">
+                  PENDENTES
+                </span>
+
+                <h2 id="admin-bookings-title">
+                  AGENDAMENTOS DO DIA
+                </h2>
+
+              </div>
+
+              <p id="admin-last-update">
+                Carregando...
+              </p>
+
+            </div>
+
+            <div
+              class="admin-loading"
+              id="admin-loading"
+              hidden
+            >
+              CARREGANDO PAINEL...
+            </div>
+
+            <div
+              class="admin-empty"
+              id="admin-empty"
+              hidden
+            >
+
+              <strong id="admin-empty-title">
+                NENHUM AGENDAMENTO
+              </strong>
+
+              <p id="admin-empty-text">
+                Não há agendamentos nesta categoria para o dia selecionado.
+              </p>
+
+            </div>
+
+            <div
+              class="admin-bookings-list"
+              id="admin-bookings-list"
+            ></div>
+
+          </section>
+
+        </section>
+
+        <section
+          class="admin-panel-section"
+          id="admin-section-gestao"
+          data-admin-panel="gestao"
+          hidden
+        >
+
+          <div class="admin-section-head">
+
+            <div>
+
+              <span>
+                CONTROLE DA AGENDA
+              </span>
+
+              <h2>
+                GESTÃO DE HORÁRIOS
+              </h2>
+
+            </div>
+
+            <p>
+              Crie atendimentos manualmente e bloqueie horários indisponíveis.
+            </p>
+
+          </div>
+
+          <div class="management-grid">
+
+            <section class="management-card">
+
+              <div class="management-card-head">
+
+                <span>
+                  NOVO AGENDAMENTO
+                </span>
+
+                <h3>
+                  Criar manualmente
+                </h3>
+
+                <p>
+                  Use para clientes que agendaram por ligação,
+                  presencialmente ou diretamente pelo WhatsApp.
+                </p>
+
+              </div>
+
+              <form
+                class="management-form"
+                id="manual-booking-form"
+              >
+
+                <div class="admin-field">
+
+                  <label for="manual-customer-name">
+                    Nome do cliente
+                  </label>
+
+                  <input
+                    id="manual-customer-name"
+                    type="text"
+                    maxlength="80"
+                    placeholder="Nome completo"
+                    autocomplete="name"
+                    required
+                  >
+
+                </div>
+
+                <div class="admin-field">
+
+                  <label for="manual-customer-phone">
+                    Telefone
+                  </label>
+
+                  <input
+                    id="manual-customer-phone"
+                    type="tel"
+                    maxlength="20"
+                    placeholder="(61) 99999-9999"
+                    autocomplete="tel"
+                    inputmode="tel"
+                    required
+                  >
+
+                </div>
+
+                <div class="admin-field">
+
+                  <label for="manual-service">
+                    Serviço
+                  </label>
+
+                  <select
+                    id="manual-service"
+                    required
+                  >
+
+                    <option value="">
+                      Selecione
+                    </option>
+
+                    <option value="Barba">
+                      Barba
+                    </option>
+
+                    <option value="Corte">
+                      Corte
+                    </option>
+
+                    <option value="Corte + Barba">
+                      Corte + Barba
+                    </option>
+
+                    <option value="Corte + Graxa">
+                      Corte + Graxa
+                    </option>
+
+                    <option value="Corte + Hidratação">
+                      Corte + Hidratação
+                    </option>
+
+                    <option value="Corte + Sobrancelha">
+                      Corte + Sobrancelha
+                    </option>
+
+                    <option value="Corte + Barba + Sobrancelha">
+                      Corte + Barba + Sobrancelha
+                    </option>
+
+                    <option value="Corte + Barba + Sobrancelha + Limpeza de Pele">
+                      Corte + Barba + Sobrancelha + Limpeza de Pele
+                    </option>
+
+                    <option value="Corte + Bigode">
+                      Corte + Bigode
+                    </option>
+
+                    <option value="Corte + Bigode + Sobrancelha">
+                      Corte + Bigode + Sobrancelha
+                    </option>
+
+                    <option value="Corte + Sobrancelha + Limpeza de Pele">
+                      Corte + Sobrancelha + Limpeza de Pele
+                    </option>
+
+                    <option value="Graxa">
+                      Graxa
+                    </option>
+
+                    <option value="Limpeza de Pele">
+                      Limpeza de Pele
+                    </option>
+
+                  </select>
+
+                </div>
+
+                <div class="management-row">
+
+                  <div class="admin-field">
+
+                    <label for="manual-booking-date">
+                      Data
+                    </label>
+
+                    <input
+                      id="manual-booking-date"
+                      type="date"
+                      required
+                    >
+
+                  </div>
+
+                  <div class="admin-field">
+
+                    <label for="manual-booking-time">
+                      Horário
+                    </label>
+
+                    <select
+                      id="manual-booking-time"
+                      required
+                    >
+
+                      <option value="">
+                        Selecione
+                      </option>
+
+                    </select>
+
+                  </div>
+
+                </div>
+
+                <div
+                  class="management-message"
+                  id="manual-booking-message"
+                  hidden
+                  role="status"
+                  aria-live="polite"
+                ></div>
+
+                <button
+                  class="admin-primary-button"
+                  id="manual-booking-submit"
+                  type="submit"
+                >
+                  CRIAR AGENDAMENTO
+                </button>
+
+              </form>
+
+            </section>
+
+            <section class="management-card">
+
+              <div class="management-card-head">
+
+                <span>
+                  INDISPONIBILIDADE
+                </span>
+
+                <h3>
+                  Bloquear horário
+                </h3>
+
+                <p>
+                  Reserve um horário para almoço, compromisso,
+                  manutenção ou qualquer indisponibilidade.
+                </p>
+
+              </div>
+
+              <form
+                class="management-form"
+                id="block-slot-form"
+              >
+
+                <div class="management-row">
+
+                  <div class="admin-field">
+
+                    <label for="block-slot-date">
+                      Data
+                    </label>
+
+                    <input
+                      id="block-slot-date"
+                      type="date"
+                      required
+                    >
+
+                  </div>
+
+                  <div class="admin-field">
+
+                    <label for="block-slot-time">
+                      Horário
+                    </label>
+
+                    <select
+                      id="block-slot-time"
+                      required
+                    >
+
+                      <option value="">
+                        Selecione
+                      </option>
+
+                    </select>
+
+                  </div>
+
+                </div>
+
+                <div class="admin-field">
+
+                  <label for="block-slot-reason">
+                    Motivo
+                  </label>
+
+                  <input
+                    id="block-slot-reason"
+                    type="text"
+                    maxlength="120"
+                    placeholder="Ex.: almoço, compromisso, manutenção"
+                  >
+
+                </div>
+
+                <div
+                  class="management-message"
+                  id="block-slot-message"
+                  hidden
+                  role="status"
+                  aria-live="polite"
+                ></div>
+
+                <button
+                  class="admin-primary-button"
+                  id="block-slot-submit"
+                  type="submit"
+                >
+                  BLOQUEAR HORÁRIO
+                </button>
+
+              </form>
+
+              <div class="blocked-list-area">
+
+                <div class="blocked-list-head">
+
+                  <div>
+
+                    <span>
+                      BLOQUEIOS
+                    </span>
+
+                    <strong>
+                      Horários indisponíveis
+                    </strong>
+
+                  </div>
+
+                  <button
+                    class="small-refresh-button"
+                    id="blocked-slots-refresh"
+                    type="button"
+                  >
+                    ATUALIZAR
+                  </button>
+
+                </div>
+
+                <div
+                  class="blocked-slots-list"
+                  id="blocked-slots-list"
+                ></div>
+
+                <div
+                  class="admin-empty compact"
+                  id="blocked-slots-empty"
+                  hidden
+                >
+
+                  <strong>
+                    NENHUM BLOQUEIO
+                  </strong>
+
+                  <p>
+                    Não existem horários bloqueados nesta data.
+                  </p>
+
+                </div>
+
+              </div>
+
+            </section>
+
+          </div>
+
+        </section>
+
+        <section
+          class="admin-panel-section"
+          id="admin-section-caixa"
+          data-admin-panel="caixa"
+          hidden
+        >
+
+          <section
+            class="cash-section"
+            id="cash-section"
+            aria-labelledby="cash-title"
+          >
+
+            <div class="admin-section-head cash-section-head">
+
+              <div>
+
+                <span>
+                  CONTROLE FINANCEIRO
+                </span>
+
+                <h2 id="cash-title">
+                  CAIXA
+                </h2>
+
+              </div>
+
+              <div class="cash-status-area">
+
+                <span
+                  class="cash-status-badge"
+                  id="cash-status-badge"
+                >
+                  CARREGANDO
+                </span>
+
+                <span
+                  class="cash-date-label"
+                  id="cash-date-label"
+                ></span>
+
+              </div>
+
+            </div>
+
+            <div class="cash-main-card">
+
+              <div class="cash-main-info">
+
+                <span>
+                  CAIXA DE HOJE
+                </span>
+
+                <strong id="cash-today-total">
+                  R$ 0,00
+                </strong>
+
+                <small id="cash-today-count">
+                  0 atendimentos recebidos
+                </small>
+
+              </div>
+
+              <div class="cash-main-actions">
+
+                <button
+                  class="cash-open-button"
+                  id="cash-open-button"
+                  type="button"
+                >
+                  ABRIR CAIXA
+                </button>
+
+                <button
+                  class="cash-close-button"
+                  id="cash-close-button"
+                  type="button"
+                  hidden
+                >
+                  FECHAR CAIXA
+                </button>
+
+              </div>
+
+            </div>
+
+            <div
+              class="cash-message"
+              id="cash-message"
+              hidden
+              role="status"
+              aria-live="polite"
+            ></div>
+
+            <div class="cash-summary-grid">
+
+              <article class="cash-summary-card">
+
+                <span>
+                  PREVISTO HOJE
+                </span>
+
+                <strong id="cash-expected-today">
+                  R$ 0,00
+                </strong>
+
+                <small id="cash-expected-count">
+                  0 atendimentos confirmados
+                </small>
+
+              </article>
+
+              <article class="cash-summary-card">
+
+                <span>
+                  RECEBIDO HOJE
+                </span>
+
+                <strong id="cash-received-today">
+                  R$ 0,00
+                </strong>
+
+                <small>
+                  faturamento real
+                </small>
+
+              </article>
+
+              <article class="cash-summary-card">
+
+                <span>
+                  TOTAL DO MÊS
+                </span>
+
+                <strong id="cash-month-total">
+                  R$ 0,00
+                </strong>
+
+                <small id="cash-month-count">
+                  0 atendimentos recebidos
+                </small>
+
+              </article>
+
+              <article class="cash-summary-card">
+
+                <span>
+                  TOTAL DO ANO
+                </span>
+
+                <strong id="cash-year-total">
+                  R$ 0,00
+                </strong>
+
+                <small id="cash-year-count">
+                  0 atendimentos recebidos
+                </small>
+
+              </article>
+
+            </div>
+
+            <section
+              class="cash-payment-section"
+              aria-labelledby="cash-payment-title"
+            >
+
+              <div class="cash-payment-section-head">
+
+                <div>
+
+                  <span>
+                    RECEBIMENTOS
+                  </span>
+
+                  <h3 id="cash-payment-title">
+                    FORMAS DE PAGAMENTO
+                  </h3>
+
+                </div>
+
+                <small>
+                  MOVIMENTAÇÃO DE HOJE
+                </small>
+
+              </div>
+
+              <div class="cash-payment-grid">
+
+                <article class="cash-payment-card">
+
+                  <div class="cash-payment-card-head">
+
+                    <span class="cash-payment-icon">
+                      $
+                    </span>
+
+                    <div>
+
+                      <span>
+                        DINHEIRO
+                      </span>
+
+                      <small>
+                        pagamentos em espécie
+                      </small>
+
+                    </div>
+
+                  </div>
+
+                  <strong id="cash-payment-cash-total">
+                    R$ 0,00
+                  </strong>
+
+                  <span
+                    class="cash-payment-count"
+                    id="cash-payment-cash-count"
+                  >
+                    0 pagamentos
+                  </span>
+
+                </article>
+
+                <article class="cash-payment-card">
+
+                  <div class="cash-payment-card-head">
+
+                    <span class="cash-payment-icon">
+                      P
+                    </span>
+
+                    <div>
+
+                      <span>
+                        PIX
+                      </span>
+
+                      <small>
+                        transferências instantâneas
+                      </small>
+
+                    </div>
+
+                  </div>
+
+                  <strong id="cash-payment-pix-total">
+                    R$ 0,00
+                  </strong>
+
+                  <span
+                    class="cash-payment-count"
+                    id="cash-payment-pix-count"
+                  >
+                    0 pagamentos
+                  </span>
+
+                </article>
+
+                <article class="cash-payment-card">
+
+                  <div class="cash-payment-card-head">
+
+                    <span class="cash-payment-icon">
+                      D
+                    </span>
+
+                    <div>
+
+                      <span>
+                        DÉBITO
+                      </span>
+
+                      <small>
+                        pagamentos no débito
+                      </small>
+
+                    </div>
+
+                  </div>
+
+                  <strong id="cash-payment-debit-total">
+                    R$ 0,00
+                  </strong>
+
+                  <span
+                    class="cash-payment-count"
+                    id="cash-payment-debit-count"
+                  >
+                    0 pagamentos
+                  </span>
+
+                </article>
+
+                <article class="cash-payment-card">
+
+                  <div class="cash-payment-card-head">
+
+                    <span class="cash-payment-icon">
+                      C
+                    </span>
+
+                    <div>
+
+                      <span>
+                        CRÉDITO
+                      </span>
+
+                      <small>
+                        pagamentos no crédito
+                      </small>
+
+                    </div>
+
+                  </div>
+
+                  <strong id="cash-payment-credit-total">
+                    R$ 0,00
+                  </strong>
+
+                  <span
+                    class="cash-payment-count"
+                    id="cash-payment-credit-count"
+                  >
+                    0 pagamentos
+                  </span>
+
+                </article>
+
+              </div>
+
+            </section>
+
+          </section>
+
+        </section>
+
+      </main>
+
+    </section>
+
+  </div>
+
+  <div
+    class="admin-modal"
+    id="booking-modal"
+    hidden
+    aria-hidden="true"
+  >
+
+    <div
+      class="admin-modal-backdrop"
+      data-close-booking-modal
+    ></div>
+
+    <div
+      class="admin-modal-card"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="booking-modal-title"
+    >
+
+      <div class="admin-modal-head">
+
+        <div>
+
+          <span>
+            AGENDAMENTO
+          </span>
+
+          <h2 id="booking-modal-title">
+            Detalhes
+          </h2>
+
+        </div>
+
+        <button
+          class="admin-modal-close"
+          id="booking-modal-close"
+          type="button"
+          aria-label="Fechar"
+        >
+          ×
+        </button>
+
+      </div>
+
+      <div
+        class="admin-modal-content"
+        id="booking-modal-content"
+      ></div>
+
+      <div
+        class="admin-modal-message"
+        id="booking-modal-message"
+        hidden
+        role="status"
+        aria-live="polite"
+      ></div>
+
+      <div
+        class="admin-modal-actions"
+        id="booking-modal-actions"
+      ></div>
+
+    </div>
+
+  </div>
+
+  <div
+    class="admin-modal"
+    id="payment-modal"
+    hidden
+    aria-hidden="true"
+  >
+
+    <div
+      class="admin-modal-backdrop"
+      data-close-payment-modal
+    ></div>
+
+    <div
+      class="admin-modal-card admin-modal-small"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="payment-modal-title"
+    >
+
+      <div class="admin-modal-head">
+
+        <div>
+
+          <span>
+            FINALIZAR ATENDIMENTO
+          </span>
+
+          <h2 id="payment-modal-title">
+            Forma de pagamento
+          </h2>
+
+        </div>
+
+        <button
+          class="admin-modal-close"
+          id="payment-modal-close"
+          type="button"
+          aria-label="Fechar"
+        >
+          ×
+        </button>
+
+      </div>
+
+      <div class="payment-options">
+
+        <button
+          class="payment-option"
+          type="button"
+          data-payment-method="cash"
+        >
+          <span>
+            $
+          </span>
+
+          <strong>
+            Dinheiro
+          </strong>
+        </button>
+
+        <button
+          class="payment-option"
+          type="button"
+          data-payment-method="pix"
+        >
+          <span>
+            P
+          </span>
+
+          <strong>
+            Pix
+          </strong>
+        </button>
+
+        <button
+          class="payment-option"
+          type="button"
+          data-payment-method="debit"
+        >
+          <span>
+            D
+          </span>
+
+          <strong>
+            Débito
+          </strong>
+        </button>
+
+        <button
+          class="payment-option"
+          type="button"
+          data-payment-method="credit"
+        >
+          <span>
+            C
+          </span>
+
+          <strong>
+            Crédito
+          </strong>
+        </button>
+
+      </div>
+
+      <div
+        class="admin-modal-message"
+        id="payment-modal-message"
+        hidden
+        role="status"
+        aria-live="polite"
+      ></div>
+
+    </div>
+
+  </div>
+
+  <div
+    class="admin-confirm"
+    id="admin-confirm"
+    hidden
+    aria-hidden="true"
+  >
+
+    <div
+      class="admin-confirm-backdrop"
+      data-close-confirm
+    ></div>
+
+    <div
+      class="admin-confirm-card"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="admin-confirm-title"
+    >
+
+      <span>
+        CONFIRMAÇÃO
+      </span>
+
+      <h2 id="admin-confirm-title">
+        Confirmar ação
+      </h2>
+
+      <p id="admin-confirm-text">
+        Deseja continuar?
+      </p>
+
+      <div class="admin-confirm-actions">
+
+        <button
+          class="admin-secondary-button"
+          id="admin-confirm-cancel"
+          type="button"
+        >
+          CANCELAR
+        </button>
+
+        <button
+          class="admin-danger-button"
+          id="admin-confirm-action"
+          type="button"
+        >
+          CONFIRMAR
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+  <script
+    src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"
+  ></script>
+
+  <script src="config.js?v=1.0"></script>
+
+  <script src="admin.js?v=1.0"></script>
+
+</body>
+</html>
