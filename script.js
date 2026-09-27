@@ -1278,19 +1278,8 @@ function buildWhatsappMessage() {
     return "";
   }
 
-  const option =
-    bookingService.options[
-      bookingService.selectedIndex
-    ];
-
   const service =
     bookingService.value;
-
-  const price =
-    option
-      ? option.dataset.price ||
-        ""
-      : "";
 
   const dateText =
     capitalizeFirst(
@@ -1300,21 +1289,16 @@ function buildWhatsappMessage() {
     );
 
   return (
-    "Olá, GNG Barbearia! " +
-    "Vim pelo site e fiz uma solicitação de agendamento:\n\n" +
-    "Serviço: " +
+    "Olá, GNG Barbearia!\n\n" +
+    "Acabei de solicitar pelo site um agendamento para *" +
     service +
-    "\n" +
-    "Valor: " +
-    price +
-    "\n" +
-    "Data: " +
+    "*, no dia *" +
     dateText +
-    "\n" +
-    "Horário: " +
+    "*, às *" +
     selectedTime +
-    "\n\n" +
-    "Gostaria de confirmar meu atendimento."
+    "*.\n\n" +
+    "Poderiam, por gentileza, confirmar meu agendamento? " +
+    "Fico no aguardo. Obrigado!"
   );
 }
 
@@ -1344,7 +1328,7 @@ function prepareWhatsappWindow() {
         "Abrindo WhatsApp...";
 
       newWindow.document.body.innerHTML =
-        '<div style="font-family:Arial,sans-serif;padding:40px;text-align:center;color:#17243a"><strong>Aguarde...</strong><p>Estamos confirmando seu horário e abrindo o WhatsApp.</p></div>';
+        '<div style="font-family:Arial,sans-serif;padding:40px;text-align:center;color:#17243a"><strong>Aguarde...</strong><p>Estamos registrando sua solicitação e abrindo o WhatsApp.</p></div>';
     } catch (
       error
     ) {
