@@ -24,7 +24,8 @@ const SUPABASE_URL =
 const SUPABASE_PUBLISHABLE_KEY =
   "sb_publishable_YqWCSylIzOdQcxuJFpE9dQ_3mVV4oji";
 
-const BUSINESS_TIMEZONE = "America/Sao_Paulo";
+const BUSINESS_TIMEZONE =
+  "America/Sao_Paulo";
 
 const SLOT_START_HOUR = 9;
 const SLOT_START_MINUTE = 0;
@@ -35,12 +36,21 @@ const SLOT_END_MINUTE = 30;
 const SLOT_INTERVAL = 30;
 const BOOKING_DAYS_COUNT = 7;
 
+let bookingBarber = null;
+let summaryBarber = null;
+
+let barbers = [];
+
+let selectedBarberId = null;
+let selectedBarberName = "";
+
 let selectedDate = null;
 let selectedTime = null;
 
 let blockedSlots = new Map();
 
-let bookingRequestInProgress = false;
+let bookingRequestInProgress =
+  false;
 
 if (year) {
   year.textContent =
@@ -48,12 +58,20 @@ if (year) {
 }
 
 function closeMenu() {
-  if (!menuToggle || !mainNav) {
+  if (
+    !menuToggle ||
+    !mainNav
+  ) {
     return;
   }
 
-  mainNav.classList.remove("is-open");
-  menuToggle.classList.remove("is-active");
+  mainNav.classList.remove(
+    "is-open"
+  );
+
+  menuToggle.classList.remove(
+    "is-active"
+  );
 
   menuToggle.setAttribute(
     "aria-expanded",
@@ -71,12 +89,20 @@ function closeMenu() {
 }
 
 function openMenu() {
-  if (!menuToggle || !mainNav) {
+  if (
+    !menuToggle ||
+    !mainNav
+  ) {
     return;
   }
 
-  mainNav.classList.add("is-open");
-  menuToggle.classList.add("is-active");
+  mainNav.classList.add(
+    "is-open"
+  );
+
+  menuToggle.classList.add(
+    "is-active"
+  );
 
   menuToggle.setAttribute(
     "aria-expanded",
@@ -94,7 +120,10 @@ function openMenu() {
 }
 
 function setupMenu() {
-  if (!menuToggle || !mainNav) {
+  if (
+    !menuToggle ||
+    !mainNav
+  ) {
     return;
   }
 
@@ -114,13 +143,17 @@ function setupMenu() {
   );
 
   mainNav
-    .querySelectorAll('a[href^="#"]')
-    .forEach(function (link) {
-      link.addEventListener(
-        "click",
-        closeMenu
-      );
-    });
+    .querySelectorAll(
+      'a[href^="#"]'
+    )
+    .forEach(
+      function (link) {
+        link.addEventListener(
+          "click",
+          closeMenu
+        );
+      }
+    );
 
   document.addEventListener(
     "click",
@@ -134,8 +167,12 @@ function setupMenu() {
       }
 
       if (
-        mainNav.contains(event.target) ||
-        menuToggle.contains(event.target)
+        mainNav.contains(
+          event.target
+        ) ||
+        menuToggle.contains(
+          event.target
+        )
       ) {
         return;
       }
@@ -147,7 +184,10 @@ function setupMenu() {
   document.addEventListener(
     "keydown",
     function (event) {
-      if (event.key === "Escape") {
+      if (
+        event.key ===
+        "Escape"
+      ) {
         closeMenu();
       }
     }
@@ -157,7 +197,8 @@ function setupMenu() {
     "resize",
     function () {
       if (
-        window.innerWidth > 860
+        window.innerWidth >
+        860
       ) {
         closeMenu();
       }
@@ -172,16 +213,22 @@ function getBusinessDateParts() {
       {
         timeZone:
           BUSINESS_TIMEZONE,
+
         year:
           "numeric",
+
         month:
           "2-digit",
+
         day:
           "2-digit",
+
         hour:
           "2-digit",
+
         minute:
           "2-digit",
+
         hourCycle:
           "h23"
       }
@@ -213,18 +260,22 @@ function getBusinessDateParts() {
       Number(
         result.year
       ),
+
     month:
       Number(
         result.month
       ),
+
     day:
       Number(
         result.day
       ),
+
     hour:
       Number(
         result.hour
       ),
+
     minute:
       Number(
         result.minute
@@ -307,6 +358,7 @@ function formatWeekday(date) {
     {
       weekday:
         "short",
+
       timeZone:
         "UTC"
     }
@@ -324,6 +376,7 @@ function formatMonth(date) {
     {
       month:
         "short",
+
       timeZone:
         "UTC"
     }
@@ -341,12 +394,16 @@ function formatFullDate(date) {
     {
       weekday:
         "long",
+
       day:
         "2-digit",
+
       month:
         "long",
+
       year:
         "numeric",
+
       timeZone:
         "UTC"
     }
@@ -407,7 +464,11 @@ function timeToMinutes(time) {
   }
 
   const parts =
-    time.split(":");
+    String(
+      time
+    ).split(
+      ":"
+    );
 
   return (
     Number(
@@ -457,8 +518,7 @@ function generateSlots() {
       );
 
     const minute =
-      minutes %
-      60;
+      minutes % 60;
 
     slots.push({
       value:
@@ -469,6 +529,7 @@ function generateSlots() {
         padNumber(
           minute
         ),
+
       minutes
     });
   }
@@ -478,7 +539,7 @@ function generateSlots() {
 
 async function supabaseRpc(
   functionName,
-  payload
+  payload = {}
 ) {
   const response =
     await fetch(
@@ -508,12 +569,12 @@ async function supabaseRpc(
       }
     );
 
-  let data = null;
-
   const contentType =
     response.headers.get(
       "content-type"
     );
+
+  let data = null;
 
   if (
     contentType &&
@@ -528,7 +589,9 @@ async function supabaseRpc(
       await response.text();
   }
 
-  if (!response.ok) {
+  if (
+    !response.ok
+  ) {
     let message =
       "Não foi possível concluir a operação.";
 
@@ -548,6 +611,296 @@ async function supabaseRpc(
   }
 
   return data;
+}
+
+function createBarberStep() {
+  if (
+    !bookingService ||
+    document.getElementById(
+      "booking-barber"
+    )
+  ) {
+    return;
+  }
+
+  const serviceStep =
+    bookingService.closest(
+      ".booking-step"
+    );
+
+  const dayStep =
+    bookingDays
+      ? bookingDays.closest(
+          ".booking-step"
+        )
+      : null;
+
+  const timeStep =
+    bookingTimes
+      ? bookingTimes.closest(
+          ".booking-step"
+        )
+      : null;
+
+  if (
+    !serviceStep ||
+    !dayStep
+  ) {
+    return;
+  }
+
+  const barberStep =
+    document.createElement(
+      "div"
+    );
+
+  barberStep.className =
+    "booking-step";
+
+  barberStep.innerHTML =
+    `
+      <div class="booking-step-heading">
+        <span class="booking-step-number">
+          02
+        </span>
+
+        <div>
+          <strong>
+            Escolha o barbeiro
+          </strong>
+
+          <small>
+            Selecione quem realizará seu atendimento
+          </small>
+        </div>
+      </div>
+
+      <label
+        class="booking-select-label"
+        for="booking-barber"
+      >
+        Barbeiro
+      </label>
+
+      <select
+        class="booking-select"
+        id="booking-barber"
+      >
+        <option value="">
+          Carregando barbeiros...
+        </option>
+      </select>
+    `;
+
+  serviceStep.insertAdjacentElement(
+    "afterend",
+    barberStep
+  );
+
+  bookingBarber =
+    document.getElementById(
+      "booking-barber"
+    );
+
+  const dayNumber =
+    dayStep.querySelector(
+      ".booking-step-number"
+    );
+
+  if (
+    dayNumber
+  ) {
+    dayNumber.textContent =
+      "03";
+  }
+
+  if (
+    timeStep
+  ) {
+    const timeNumber =
+      timeStep.querySelector(
+        ".booking-step-number"
+      );
+
+    if (
+      timeNumber
+    ) {
+      timeNumber.textContent =
+        "04";
+    }
+  }
+
+  createBarberSummary();
+}
+
+function createBarberSummary() {
+  if (
+    document.getElementById(
+      "summary-barber"
+    )
+  ) {
+    summaryBarber =
+      document.getElementById(
+        "summary-barber"
+      );
+
+    return;
+  }
+
+  if (
+    !summaryDate
+  ) {
+    return;
+  }
+
+  const dateRow =
+    summaryDate.parentElement;
+
+  if (
+    !dateRow ||
+    !dateRow.parentElement
+  ) {
+    return;
+  }
+
+  const barberRow =
+    document.createElement(
+      "div"
+    );
+
+  barberRow.innerHTML =
+    `
+      <span>
+        Barbeiro
+      </span>
+
+      <strong id="summary-barber">
+        Não selecionado
+      </strong>
+    `;
+
+  dateRow.parentElement.insertBefore(
+    barberRow,
+    dateRow
+  );
+
+  summaryBarber =
+    document.getElementById(
+      "summary-barber"
+    );
+}
+
+async function loadBarbers() {
+  if (
+    !bookingBarber
+  ) {
+    return;
+  }
+
+  try {
+    const data =
+      await supabaseRpc(
+        "get_public_barbers"
+      );
+
+    barbers =
+      Array.isArray(
+        data
+      )
+        ? data
+        : [];
+
+    bookingBarber.innerHTML =
+      "";
+
+    const placeholder =
+      document.createElement(
+        "option"
+      );
+
+    placeholder.value =
+      "";
+
+    placeholder.textContent =
+      "Selecione um barbeiro";
+
+    bookingBarber.appendChild(
+      placeholder
+    );
+
+    barbers.forEach(
+      function (barber) {
+        const option =
+          document.createElement(
+            "option"
+          );
+
+        option.value =
+          barber.id;
+
+        option.textContent =
+          barber.name;
+
+        bookingBarber.appendChild(
+          option
+        );
+      }
+    );
+
+    if (
+      barbers.length ===
+      0
+    ) {
+      placeholder.textContent =
+        "Nenhum barbeiro disponível";
+
+      bookingBarber.disabled =
+        true;
+    }
+  } catch (error) {
+    console.error(
+      "Erro ao carregar barbeiros:",
+      error
+    );
+
+    bookingBarber.innerHTML =
+      '<option value="">Não foi possível carregar os barbeiros</option>';
+
+    bookingBarber.disabled =
+      true;
+  }
+}
+
+function getSelectedBarber() {
+  if (
+    !selectedBarberId
+  ) {
+    return null;
+  }
+
+  return (
+    barbers.find(
+      function (barber) {
+        return (
+          barber.id ===
+          selectedBarberId
+        );
+      }
+    ) ||
+    null
+  );
+}
+
+function updateBarberSummary() {
+  if (
+    !summaryBarber
+  ) {
+    return;
+  }
+
+  summaryBarber.textContent =
+    selectedBarberName ||
+    "Não selecionado";
 }
 
 function clearBlockedSlots() {
@@ -603,6 +956,12 @@ function isSlotBlocked(
 function hasAvailableTime(
   dateKey
 ) {
+  if (
+    !selectedBarberId
+  ) {
+    return false;
+  }
+
   const slots =
     generateSlots();
 
@@ -631,7 +990,43 @@ function hasAvailableTime(
   );
 }
 
+function showBarberRequiredState() {
+  if (
+    bookingDays
+  ) {
+    bookingDays.innerHTML =
+      `
+        <div class="booking-empty">
+          Escolha um barbeiro para visualizar os dias disponíveis.
+        </div>
+      `;
+  }
+
+  if (
+    bookingTimes
+  ) {
+    bookingTimes.innerHTML =
+      `
+        <div class="booking-empty">
+          Escolha um barbeiro para visualizar os horários disponíveis.
+        </div>
+      `;
+  }
+}
+
 async function loadBookedSlots() {
+  if (
+    !selectedBarberId
+  ) {
+    clearBlockedSlots();
+
+    showBarberRequiredState();
+
+    updateSubmitState();
+
+    return;
+  }
+
   try {
     const today =
       getTodayDate();
@@ -645,8 +1040,11 @@ async function loadBookedSlots() {
 
     const data =
       await supabaseRpc(
-        "get_public_booked_slots",
+        "get_public_booked_slots_by_barber",
         {
+          p_barber_id:
+            selectedBarberId,
+
           p_start_date:
             dateToKey(
               today
@@ -667,9 +1065,7 @@ async function loadBookedSlots() {
       )
     ) {
       data.forEach(
-        function (
-          booking
-        ) {
+        function (booking) {
           addBlockedSlot(
             booking.booking_date,
             normalizeDatabaseTime(
@@ -684,14 +1080,14 @@ async function loadBookedSlots() {
       selectedDate &&
       selectedTime
     ) {
-      const selectedKey =
+      const dateKey =
         dateToKey(
           selectedDate
         );
 
       if (
         isSlotBlocked(
-          selectedKey,
+          dateKey,
           selectedTime
         )
       ) {
@@ -702,7 +1098,12 @@ async function loadBookedSlots() {
       }
     }
 
-    renderTimes();
+    if (
+      selectedDate
+    ) {
+      renderTimes();
+    }
+
     updateSubmitState();
   } catch (error) {
     console.error(
@@ -761,7 +1162,9 @@ function updateDateSummary(
     return;
   }
 
-  if (!date) {
+  if (
+    !date
+  ) {
     summaryDate.textContent =
       "Não selecionado";
 
@@ -815,6 +1218,7 @@ function updateSubmitState() {
   bookingSubmit.disabled =
     bookingRequestInProgress ||
     !bookingService.value ||
+    !selectedBarberId ||
     !selectedDate ||
     !selectedTime ||
     occupied;
@@ -824,6 +1228,13 @@ function renderDays() {
   if (
     !bookingDays
   ) {
+    return;
+  }
+
+  if (
+    !selectedBarberId
+  ) {
+    showBarberRequiredState();
     return;
   }
 
@@ -898,11 +1309,25 @@ function renderDays() {
       );
     }
 
-    if (
-      !firstAvailableDate &&
+    const available =
       hasAvailableTime(
         dateKey
-      )
+      );
+
+    if (
+      !available
+    ) {
+      button.disabled =
+        true;
+
+      button.classList.add(
+        "is-disabled"
+      );
+    }
+
+    if (
+      !firstAvailableDate &&
+      available
     ) {
       firstAvailableDate =
         date;
@@ -911,6 +1336,12 @@ function renderDays() {
     button.addEventListener(
       "click",
       function () {
+        if (
+          button.disabled
+        ) {
+          return;
+        }
+
         selectDate(
           date
         );
@@ -928,12 +1359,33 @@ function renderDays() {
     selectDate(
       firstAvailableDate
     );
+  } else {
+    selectedDate =
+      null;
+
+    selectedTime =
+      null;
+
+    updateDateSummary(
+      null
+    );
+
+    updateTimeSummary();
+
+    if (
+      bookingTimes
+    ) {
+      bookingTimes.innerHTML =
+        `
+          <div class="booking-empty">
+            Este barbeiro não possui horários disponíveis neste período.
+          </div>
+        `;
+    }
   }
 }
 
-function selectDate(
-  date
-) {
+function selectDate(date) {
   selectedDate =
     new Date(
       date.getTime()
@@ -957,9 +1409,7 @@ function selectDate(
       : [];
 
   buttons.forEach(
-    function (
-      button
-    ) {
+    function (button) {
       const active =
         button.dataset.date ===
         selectedKey;
@@ -991,9 +1441,28 @@ function selectDate(
 
 function renderTimes() {
   if (
-    !bookingTimes ||
+    !bookingTimes
+  ) {
+    return;
+  }
+
+  if (
+    !selectedBarberId
+  ) {
+    showBarberRequiredState();
+    return;
+  }
+
+  if (
     !selectedDate
   ) {
+    bookingTimes.innerHTML =
+      `
+        <div class="booking-empty">
+          Escolha um dia para visualizar os horários.
+        </div>
+      `;
+
     return;
   }
 
@@ -1015,9 +1484,7 @@ function renderTimes() {
     generateSlots();
 
   slots.forEach(
-    function (
-      slot
-    ) {
+    function (slot) {
       const button =
         document.createElement(
           "button"
@@ -1140,7 +1607,8 @@ function selectTime(
   button
 ) {
   if (
-    !selectedDate
+    !selectedDate ||
+    !selectedBarberId
   ) {
     return;
   }
@@ -1172,9 +1640,7 @@ function selectTime(
       : [];
 
   buttons.forEach(
-    function (
-      item
-    ) {
+    function (item) {
       const active =
         item ===
         button;
@@ -1198,6 +1664,79 @@ function selectTime(
   updateSubmitState();
 }
 
+async function handleBarberChange() {
+  if (
+    !bookingBarber
+  ) {
+    return;
+  }
+
+  selectedBarberId =
+    bookingBarber.value ||
+    null;
+
+  const barber =
+    getSelectedBarber();
+
+  selectedBarberName =
+    barber
+      ? barber.name
+      : "";
+
+  selectedDate =
+    null;
+
+  selectedTime =
+    null;
+
+  clearBlockedSlots();
+
+  updateBarberSummary();
+
+  updateDateSummary(
+    null
+  );
+
+  updateTimeSummary();
+
+  updateSubmitState();
+
+  if (
+    !selectedBarberId
+  ) {
+    showBarberRequiredState();
+    return;
+  }
+
+  if (
+    bookingDays
+  ) {
+    bookingDays.innerHTML =
+      `
+        <div class="booking-empty">
+          Carregando disponibilidade...
+        </div>
+      `;
+  }
+
+  if (
+    bookingTimes
+  ) {
+    bookingTimes.innerHTML =
+      `
+        <div class="booking-empty">
+          Carregando horários...
+        </div>
+      `;
+  }
+
+  await loadBookedSlots();
+
+  renderDays();
+
+  updateSubmitState();
+}
+
 function findServiceOption(
   service
 ) {
@@ -1210,9 +1749,7 @@ function findServiceOption(
   return Array.from(
     bookingService.options
   ).find(
-    function (
-      option
-    ) {
+    function (option) {
       return (
         option.value ===
         service
@@ -1247,9 +1784,7 @@ function selectServiceFromLink(
 
 function setupServiceLinks() {
   serviceLinks.forEach(
-    function (
-      link
-    ) {
+    function (link) {
       link.addEventListener(
         "click",
         function () {
@@ -1272,6 +1807,8 @@ function setupServiceLinks() {
 function buildWhatsappMessage() {
   if (
     !bookingService ||
+    !selectedBarberId ||
+    !selectedBarberName ||
     !selectedDate ||
     !selectedTime
   ) {
@@ -1292,6 +1829,8 @@ function buildWhatsappMessage() {
     "Olá, GNG Barbearia!\n\n" +
     "Acabei de solicitar pelo site um agendamento para *" +
     service +
+    "* com o barbeiro *" +
+    selectedBarberName +
     "*, no dia *" +
     dateText +
     "*, às *" +
@@ -1329,9 +1868,7 @@ function prepareWhatsappWindow() {
 
       newWindow.document.body.innerHTML =
         '<div style="font-family:Arial,sans-serif;padding:40px;text-align:center;color:#17243a"><strong>Aguarde...</strong><p>Estamos registrando sua solicitação e abrindo o WhatsApp.</p></div>';
-    } catch (
-      error
-    ) {
+    } catch (error) {
       console.error(
         error
       );
@@ -1355,15 +1892,13 @@ function sendWhatsappToWindow(
 
     try {
       preparedWindow.focus();
-    } catch (
-      error
-    ) {
+    } catch (error) {
       console.error(
         error
       );
     }
 
-    return true;
+    return;
   }
 
   const link =
@@ -1387,8 +1922,6 @@ function sendWhatsappToWindow(
   link.click();
 
   link.remove();
-
-  return false;
 }
 
 async function submitBooking() {
@@ -1396,6 +1929,7 @@ async function submitBooking() {
     bookingRequestInProgress ||
     !bookingService ||
     !bookingService.value ||
+    !selectedBarberId ||
     !selectedDate ||
     !selectedTime
   ) {
@@ -1414,10 +1948,12 @@ async function submitBooking() {
     )
   ) {
     alert(
-      "Esse horário acabou de ser ocupado. Escolha outro horário."
+      "Esse horário acabou de ser ocupado para este barbeiro. Escolha outro horário."
     );
 
     await loadBookedSlots();
+
+    renderDays();
 
     return;
   }
@@ -1445,13 +1981,19 @@ async function submitBooking() {
 
   try {
     await supabaseRpc(
-      "create_booking_request",
+      "create_booking_request_by_barber",
       {
         p_customer_name:
           "Cliente via WhatsApp",
 
+        p_customer_phone:
+          null,
+
         p_service:
           bookingService.value,
+
+        p_barber_id:
+          selectedBarberId,
 
         p_booking_date:
           bookingDate,
@@ -1479,15 +2021,15 @@ async function submitBooking() {
 
     updateSubmitState();
 
-    setTimeout(
-      function () {
-        loadBookedSlots();
+    window.setTimeout(
+      async function () {
+        await loadBookedSlots();
+
+        renderDays();
       },
       1200
     );
-  } catch (
-    error
-  ) {
+  } catch (error) {
     if (
       whatsappWindow &&
       !whatsappWindow.closed
@@ -1496,6 +2038,8 @@ async function submitBooking() {
     }
 
     await loadBookedSlots();
+
+    renderDays();
 
     const message =
       error &&
@@ -1539,10 +2083,21 @@ async function setupBooking() {
     return;
   }
 
+  createBarberStep();
+
   bookingService.addEventListener(
     "change",
     updateServiceSummary
   );
+
+  if (
+    bookingBarber
+  ) {
+    bookingBarber.addEventListener(
+      "change",
+      handleBarberChange
+    );
+  }
 
   if (
     bookingSubmit
@@ -1557,11 +2112,17 @@ async function setupBooking() {
 
   updateServiceSummary();
 
+  updateBarberSummary();
+
+  updateDateSummary(
+    null
+  );
+
   updateTimeSummary();
 
-  await loadBookedSlots();
+  showBarberRequiredState();
 
-  renderDays();
+  await loadBarbers();
 
   updateSubmitState();
 }
@@ -1575,14 +2136,10 @@ function setupInternalLinks() {
     );
 
   links.forEach(
-    function (
-      link
-    ) {
+    function (link) {
       link.addEventListener(
         "click",
-        function (
-          event
-        ) {
+        function (event) {
           const href =
             link.getAttribute(
               "href"
@@ -1652,9 +2209,30 @@ function refreshCurrentDayState() {
     }
   }
 
-  renderTimes();
+  if (
+    selectedBarberId &&
+    selectedDate
+  ) {
+    renderTimes();
+  }
 
   updateSubmitState();
+}
+
+async function refreshAvailability() {
+  if (
+    !selectedBarberId
+  ) {
+    return;
+  }
+
+  await loadBookedSlots();
+
+  if (
+    selectedBarberId
+  ) {
+    renderDays();
+  }
 }
 
 function initializeSite() {
@@ -1670,7 +2248,7 @@ function initializeSite() {
   );
 
   window.setInterval(
-    loadBookedSlots,
+    refreshAvailability,
     30000
   );
 }
