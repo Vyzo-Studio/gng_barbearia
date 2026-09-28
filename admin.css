@@ -2116,3 +2116,11 @@ textarea:focus-visible {
     animation: none !important;
   }
 }
+
+@media (max-width: 760px) {
+  .admin-field input,
+  .admin-field select,
+  .admin-field textarea {
+    font-size: 16px;
+  }
+}
