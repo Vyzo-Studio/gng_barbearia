@@ -3,33 +3,25 @@
     return;
   }
 
-  window.GNG_BARBERS_ENHANCEMENT_INSTALLED =
-    true;
+  window.GNG_BARBERS_ENHANCEMENT_INSTALLED = true;
 
   let barbers = [];
   let manualBarber = null;
   let blockSlotBarber = null;
+
   let originalRenderBookings = null;
   let originalOpenBookingModal = null;
   let originalClientRpc = null;
 
   function getClient() {
-    return (
-      window.supabaseClient ||
-      null
-    );
+    return window.supabaseClient || null;
   }
 
   function getBarberName(barberId) {
     const barber =
-      barbers.find(
-        function (item) {
-          return (
-            item.id ===
-            barberId
-          );
-        }
-      );
+      barbers.find(function (item) {
+        return item.id === barberId;
+      }) || null;
 
     return barber
       ? barber.name
@@ -145,16 +137,13 @@
           "afterend",
           field.wrapper
         );
-
-        manualBarber =
-          field.select;
       }
-    } else {
-      manualBarber =
-        document.getElementById(
-          "manual-barber"
-        );
     }
+
+    manualBarber =
+      document.getElementById(
+        "manual-barber"
+      );
 
     if (
       !document.getElementById(
@@ -196,16 +185,13 @@
           field.wrapper,
           firstRow
         );
-
-        blockSlotBarber =
-          field.select;
       }
-    } else {
-      blockSlotBarber =
-        document.getElementById(
-          "block-slot-barber"
-        );
     }
+
+    blockSlotBarber =
+      document.getElementById(
+        "block-slot-barber"
+      );
   }
 
   async function loadBarbers() {
@@ -222,87 +208,14 @@
           ? data
           : [];
 
-      [
-        {
-          select:
-            manualBarber,
+      populateBarberSelect(
+        manualBarber,
+        "Selecione o barbeiro"
+      );
 
-          placeholder:
-            "Selecione o barbeiro"
-        },
-        {
-          select:
-            blockSlotBarber,
-
-          placeholder:
-            "Todos os barbeiros"
-        }
-      ].forEach(
-        function ({
-          select,
-          placeholder
-        }) {
-          if (
-            !select
-          ) {
-            return;
-          }
-
-          const current =
-            select.value;
-
-          select.innerHTML =
-            "";
-
-          const first =
-            document.createElement(
-              "option"
-            );
-
-          first.value =
-            "";
-
-          first.textContent =
-            placeholder;
-
-          select.appendChild(
-            first
-          );
-
-          barbers.forEach(
-            function (barber) {
-              const option =
-                document.createElement(
-                  "option"
-                );
-
-              option.value =
-                barber.id;
-
-              option.textContent =
-                barber.name;
-
-              select.appendChild(
-                option
-              );
-            }
-          );
-
-          if (
-            current &&
-            barbers.some(
-              function (barber) {
-                return (
-                  barber.id ===
-                  current
-                );
-              }
-            )
-          ) {
-            select.value =
-              current;
-          }
-        }
+      populateBarberSelect(
+        blockSlotBarber,
+        "Todos os barbeiros"
       );
     } catch (error) {
       console.error(
@@ -315,6 +228,72 @@
         "Não foi possível carregar os barbeiros.",
         "error"
       );
+    }
+  }
+
+  function populateBarberSelect(
+    select,
+    placeholder
+  ) {
+    if (
+      !select
+    ) {
+      return;
+    }
+
+    const current =
+      select.value;
+
+    select.innerHTML =
+      "";
+
+    const first =
+      document.createElement(
+        "option"
+      );
+
+    first.value =
+      "";
+
+    first.textContent =
+      placeholder;
+
+    select.appendChild(
+      first
+    );
+
+    barbers.forEach(
+      function (barber) {
+        const option =
+          document.createElement(
+            "option"
+          );
+
+        option.value =
+          barber.id;
+
+        option.textContent =
+          barber.name;
+
+        select.appendChild(
+          option
+        );
+      }
+    );
+
+    if (
+      current &&
+      barbers.some(
+        function (barber) {
+          return (
+            barber.id ===
+            current
+          );
+        }
+      )
+    ) {
+      select.value =
+        current;
     }
   }
 
@@ -485,15 +464,15 @@
             return;
           }
 
-          const oldLabel =
+          const existing =
             serviceArea.querySelector(
               "[data-barber-label]"
             );
 
           if (
-            oldLabel
+            existing
           ) {
-            oldLabel.remove();
+            existing.remove();
           }
 
           const label =
@@ -562,12 +541,20 @@
           );
 
         if (
-          !grid ||
-          grid.querySelector(
-            "[data-barber-modal-detail]"
-          )
+          !grid
         ) {
           return;
+        }
+
+        const existing =
+          grid.querySelector(
+            "[data-barber-modal-detail]"
+          );
+
+        if (
+          existing
+        ) {
+          existing.remove();
         }
 
         const item =
@@ -609,12 +596,11 @@
           );
 
         if (
-          serviceItem &&
-          serviceItem.nextSibling
+          serviceItem
         ) {
-          grid.insertBefore(
-            item,
-            serviceItem.nextSibling
+          serviceItem.insertAdjacentElement(
+            "afterend",
+            item
           );
         } else {
           grid.appendChild(
@@ -622,6 +608,25 @@
           );
         }
       };
+  }
+
+  function setupSearchEnhancement() {
+    if (
+      !adminSearch
+    ) {
+      return;
+    }
+
+    adminSearch.addEventListener(
+      "input",
+      function () {
+        window.requestAnimationFrame(
+          function () {
+            enhanceBookingCards();
+          }
+        );
+      }
+    );
   }
 
   function markSelectWaitingForBarber(
@@ -1053,6 +1058,12 @@
 
   async function loadBlockedSlotsByBarber() {
     if (
+      !state.user
+    ) {
+      return;
+    }
+
+    if (
       !blockSlotDate ||
       !blockSlotDate.value
     ) {
@@ -1077,6 +1088,18 @@
           : [];
 
       renderBlockedSlotsByBarber();
+
+      if (
+        blockSlotMessage &&
+        blockSlotMessage.classList.contains(
+          "is-error"
+        )
+      ) {
+        setMessage(
+          blockSlotMessage,
+          ""
+        );
+      }
     } catch (error) {
       console.error(
         error
@@ -1378,6 +1401,13 @@
       manualBarber.addEventListener(
         "change",
         async function () {
+          if (
+            !manualBookingDate ||
+            !manualBookingDate.value
+          ) {
+            return;
+          }
+
           await refreshTimeSelectAvailability(
             manualBookingTime,
             manualBookingDate.value
@@ -1392,6 +1422,13 @@
       blockSlotBarber.addEventListener(
         "change",
         async function () {
+          if (
+            !blockSlotDate ||
+            !blockSlotDate.value
+          ) {
+            return;
+          }
+
           await refreshTimeSelectAvailability(
             blockSlotTime,
             blockSlotDate.value
@@ -1399,6 +1436,8 @@
         }
       );
     }
+
+    setupSearchEnhancement();
   }
 
   async function install() {
@@ -1434,11 +1473,11 @@
 
     await refreshManagementAvailability();
 
-    await loadBlockedSlotsByBarber();
-
     if (
       state.user
     ) {
+      await loadBlockedSlotsByBarber();
+
       await refreshDashboard();
     }
   }
