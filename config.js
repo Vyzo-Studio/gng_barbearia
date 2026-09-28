@@ -155,41 +155,123 @@ function isConfiguredAdminEmail(email) {
   );
 }
 
-function loadAdminNotifications() {
-  if (
-    document.querySelector(
-      'script[data-gng-admin-notifications="true"]'
-    )
-  ) {
-    return;
-  }
+function loadScriptOnce({
+  src,
+  dataAttribute,
+  errorMessage
+}) {
+  return new Promise(
+    function (resolve, reject) {
+      const selector =
+        "script[" +
+        dataAttribute +
+        '="true"]';
 
-  const script =
-    document.createElement(
-      "script"
-    );
+      const existing =
+        document.querySelector(
+          selector
+        );
 
-  script.src =
-    "admin-notifications.js?v=2.0";
+      if (existing) {
+        resolve();
+        return;
+      }
 
-  script.async =
-    true;
+      const script =
+        document.createElement(
+          "script"
+        );
 
-  script.dataset.gngAdminNotifications =
-    "true";
+      script.src =
+        src;
 
-  script.addEventListener(
-    "error",
-    function () {
-      console.error(
-        "Não foi possível carregar o sistema de notificações."
+      script.async =
+        false;
+
+      script.setAttribute(
+        dataAttribute,
+        "true"
+      );
+
+      script.addEventListener(
+        "load",
+        function () {
+          resolve();
+        }
+      );
+
+      script.addEventListener(
+        "error",
+        function () {
+          console.error(
+            errorMessage
+          );
+
+          reject(
+            new Error(
+              errorMessage
+            )
+          );
+        }
+      );
+
+      document.body.appendChild(
+        script
       );
     }
   );
+}
 
-  document.head.appendChild(
-    script
-  );
+async function loadAdminModules() {
+  try {
+    await loadScriptOnce({
+      src:
+        "admin-barbers.js?v=1.0",
+
+      dataAttribute:
+        "data-gng-admin-barbers",
+
+      errorMessage:
+        "Não foi possível carregar o módulo de barbeiros."
+    });
+
+    await loadScriptOnce({
+      src:
+        "admin-notifications.js?v=3.0",
+
+      dataAttribute:
+        "data-gng-admin-notifications",
+
+      errorMessage:
+        "Não foi possível carregar o sistema de notificações."
+    });
+  } catch (error) {
+    console.error(
+      error
+    );
+  }
+}
+
+function scheduleAdminModules() {
+  if (
+    document.readyState ===
+    "loading"
+  ) {
+    document.addEventListener(
+      "DOMContentLoaded",
+      function () {
+        loadAdminModules();
+      },
+      {
+        once:
+          true
+      }
+    );
+
+    return;
+  }
+
+  loadAdminModules();
 }
 
 window.GNG_CONFIG = {
@@ -274,7 +356,7 @@ if (
         }
       );
 
-    loadAdminNotifications();
+    scheduleAdminModules();
   } catch (error) {
     console.error(
       "Erro ao iniciar Supabase:",
