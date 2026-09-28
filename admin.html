@@ -648,7 +648,7 @@
               <input
                 id="admin-search"
                 type="search"
-                placeholder="Nome, telefone ou serviço"
+                placeholder="Nome, telefone, serviço ou barbeiro"
                 autocomplete="off"
                 autocapitalize="none"
                 autocorrect="off"
@@ -755,7 +755,7 @@
             </div>
 
             <p>
-              Crie atendimentos manualmente e bloqueie horários indisponíveis.
+              Crie atendimentos manualmente e bloqueie horários por profissional.
             </p>
 
           </div>
@@ -892,6 +892,25 @@
 
                 </div>
 
+                <div class="admin-field">
+
+                  <label for="manual-barber">
+                    Barbeiro
+                  </label>
+
+                  <select
+                    id="manual-barber"
+                    required
+                  >
+
+                    <option value="">
+                      Carregando barbeiros...
+                    </option>
+
+                  </select>
+
+                </div>
+
                 <div class="management-row">
 
                   <div class="admin-field">
@@ -962,8 +981,8 @@
                 </h3>
 
                 <p>
-                  Reserve um horário para almoço, compromisso,
-                  manutenção ou qualquer indisponibilidade.
+                  Bloqueie um horário para um profissional específico
+                  ou para todos os barbeiros.
                 </p>
 
               </div>
@@ -972,6 +991,24 @@
                 class="management-form"
                 id="block-slot-form"
               >
+
+                <div class="admin-field">
+
+                  <label for="block-slot-barber">
+                    Aplicar bloqueio a
+                  </label>
+
+                  <select
+                    id="block-slot-barber"
+                  >
+
+                    <option value="">
+                      Todos os barbeiros
+                    </option>
+
+                  </select>
+
+                </div>
 
                 <div class="management-row">
 
@@ -1682,9 +1719,9 @@
     src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"
   ></script>
 
-  <script src="config.js?v=1.0"></script>
+  <script src="config.js?v=2.0"></script>
 
-  <script src="admin.js?v=1.0"></script>
+  <script src="admin.js?v=1.1"></script>
 
 </body>
 </html>
