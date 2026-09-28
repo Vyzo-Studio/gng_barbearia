@@ -226,7 +226,7 @@ async function loadAdminModules() {
   try {
     await loadScriptOnce({
       src:
-        "admin-barbers.js?v=1.0",
+        "admin-barbers.js?v=1.1",
 
       dataAttribute:
         "data-gng-admin-barbers",
