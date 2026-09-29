@@ -2843,3 +2843,118 @@ input:focus-visible {
     animation: none !important;
   }
 }
+
+/* =========================================================
+   GNG BARBEARIA — VISUAL REFRESH
+   Versão estética premium
+   ========================================================= */
+
+:root {
+  --navy: #22334f;
+  --navy-dark: #17253c;
+  --navy-deep: #0c1626;
+  --navy-light: #3b5070;
+
+  --steel: #7d899a;
+  --steel-light: #e3e7ed;
+
+  --bone: #f7f4ee;
+  --ice: #eef1f5;
+  --white: #ffffff;
+
+  --ink: #0c1422;
+  --text: #263247;
+  --muted: #657184;
+
+  --orange: #dc791b;
+  --orange-soft: #fff1e3;
+
+  --success: #216d54;
+
+  --line: rgba(34, 51, 79, 0.11);
+
+  --shadow:
+    0 18px 48px rgba(12, 22, 38, 0.09);
+
+  --shadow-soft:
+    0 8px 25px rgba(12, 22, 38, 0.07);
+
+  --shadow-premium:
+    0 24px 70px rgba(12, 22, 38, 0.14);
+}
+
+/* =========================================================
+   BASE
+   ========================================================= */
+
+body {
+  background: var(--bone);
+  color: var(--text);
+}
+
+::selection {
+  background: var(--navy);
+  color: var(--white);
+}
+
+/* =========================================================
+   HEADER
+   ========================================================= */
+
+.site-header {
+  border-bottom:
+    1px solid
+    rgba(34, 51, 79, 0.09);
+
+  background:
+    rgba(247, 244, 238, 0.94);
+
+  box-shadow:
+    0 4px 22px
+    rgba(12, 22, 38, 0.035);
+}
+
+.brand img {
+  object-fit: contain;
+
+  background: var(--navy);
+
+  box-shadow:
+    0 8px 24px
+    rgba(12, 22, 38, 0.12);
+}
+
+.main-nav a {
+  color: #536076;
+
+  transition:
+    color 0.18s ease,
+    background 0.18s ease;
+}
+
+.main-nav a:hover {
+  color: var(--navy-deep);
+}
+
+.main-nav .nav-cta {
+  background:
+    linear-gradient(
+      135deg,
+      var(--navy),
+      var(--navy-dark)
+    );
+
+  box-shadow:
+    0 10px 24px
+    rgba(34, 51, 79, 0.15);
+}
+
+/* =========================================================
+   BOTÕES
+   ========================================================= */
+
+.btn-primary {
+  background:
+    linear-gradient(
+      135deg,
+      var(--
