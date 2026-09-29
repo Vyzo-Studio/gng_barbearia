@@ -17,10 +17,8 @@ const serviceLinks = Array.from(
 );
 
 const WHATSAPP_NUMBER = "5561994075539";
-
 const SUPABASE_URL =
   "https://ueqfokfnjsjgocotvdae.supabase.co";
-
 const SUPABASE_PUBLISHABLE_KEY =
   "sb_publishable_YqWCSylIzOdQcxuJFpE9dQ_3mVV4oji";
 
@@ -61,9 +59,18 @@ let bookingRequestInProgress = false;
 let mobileServicesExpanded = false;
 let servicesToggleButton = null;
 
+let mobileBookingOpenStep = null;
+let mobileNavTicking = false;
+
 if (year) {
   year.textContent =
     new Date().getFullYear();
+}
+
+function isMobileLayout() {
+  return window.matchMedia(
+    `(max-width: ${MOBILE_BREAKPOINT}px)`
+  ).matches;
 }
 
 function setupDeviceDetection() {
@@ -81,35 +88,26 @@ function setupDeviceDetection() {
     touchPoints > 1;
 
   const isIOS =
-    /iPhone|iPad|iPod/i.test(userAgent) ||
+    /iPhone|iPad|iPod/i.test(
+      userAgent
+    ) ||
     isIPadDesktopMode;
 
   const isAndroid =
-    /Android/i.test(userAgent);
+    /Android/i.test(
+      userAgent
+    );
 
   const isMacOS =
     !isIOS &&
-    /Macintosh|Mac OS X/i.test(userAgent);
+    /Macintosh|Mac OS X/i.test(
+      userAgent
+    );
 
   const isWindows =
-    /Windows/i.test(userAgent);
-
-  const isMobileViewport =
-    window.matchMedia(
-      `(max-width: ${MOBILE_BREAKPOINT}px)`
-    ).matches;
-
-  const root =
-    document.documentElement;
-
-  root.classList.remove(
-    "device-ios",
-    "device-android",
-    "device-mobile",
-    "device-macos",
-    "device-windows",
-    "device-desktop"
-  );
+    /Windows/i.test(
+      userAgent
+    );
 
   let device =
     "desktop";
@@ -126,10 +124,24 @@ function setupDeviceDetection() {
   } else if (isWindows) {
     device =
       "windows";
-  } else if (isMobileViewport) {
+  } else if (
+    isMobileLayout()
+  ) {
     device =
       "mobile";
   }
+
+  const root =
+    document.documentElement;
+
+  root.classList.remove(
+    "device-ios",
+    "device-android",
+    "device-mobile",
+    "device-macos",
+    "device-windows",
+    "device-desktop"
+  );
 
   root.classList.add(
     "device-" + device
@@ -143,7 +155,8 @@ function setupDeviceDetection() {
 
 function getDeviceType() {
   return (
-    document.documentElement.dataset.device ||
+    document.documentElement
+      .dataset.device ||
     setupDeviceDetection()
   );
 }
@@ -159,19 +172,32 @@ function isMobileDevice() {
   );
 }
 
+function digitsOnly(value) {
+  return String(
+    value || ""
+  ).replace(
+    /\D/g,
+    ""
+  );
+}
+
 function buildWhatsappUrl(
   number,
   message
 ) {
   const cleanNumber =
-    digitsOnly(number);
+    digitsOnly(
+      number
+    );
 
   const encodedMessage =
     encodeURIComponent(
       message || ""
     );
 
-  if (isMobileDevice()) {
+  if (
+    isMobileDevice()
+  ) {
     return (
       "https://wa.me/" +
       cleanNumber +
@@ -188,9 +214,13 @@ function buildWhatsappUrl(
   );
 }
 
-function readWhatsappLink(link) {
+function readWhatsappLink(
+  link
+) {
   const href =
-    link.getAttribute("href");
+    link.getAttribute(
+      "href"
+    );
 
   if (!href) {
     return null;
@@ -203,11 +233,15 @@ function readWhatsappLink(link) {
         window.location.href
       );
 
-    let number = "";
+    let number =
+      "";
 
     if (
-      url.hostname === "wa.me" ||
-      url.hostname.endsWith(".wa.me")
+      url.hostname ===
+        "wa.me" ||
+      url.hostname.endsWith(
+        ".wa.me"
+      )
     ) {
       number =
         url.pathname.replace(
@@ -238,6 +272,7 @@ function readWhatsappLink(link) {
 
     return {
       number,
+
       message:
         url.searchParams.get(
           "text"
@@ -538,12 +573,9 @@ function setupMobileServices() {
   }
 
   function updateMobileServices() {
-    const isMobile =
-      window.matchMedia(
-        `(max-width: ${MOBILE_BREAKPOINT}px)`
-      ).matches;
-
-    if (!isMobile) {
+    if (
+      !isMobileLayout()
+    ) {
       rows.forEach(
         function (row) {
           row.hidden =
@@ -573,13 +605,10 @@ function setupMobileServices() {
         row,
         index
       ) {
-        const shouldHide =
+        row.hidden =
           !mobileServicesExpanded &&
           index >=
             MOBILE_SERVICES_VISIBLE_COUNT;
-
-        row.hidden =
-          shouldHide;
       }
     );
 
@@ -617,12 +646,646 @@ function setupMobileServices() {
       "change",
       updateMobileServices
     );
+
   } else if (
     typeof mediaQuery.addListener ===
     "function"
   ) {
     mediaQuery.addListener(
       updateMobileServices
+    );
+  }
+}
+
+function injectDynamicStyles() {
+  if (
+    document.getElementById(
+      "gng-dynamic-styles"
+    )
+  ) {
+    return;
+  }
+
+  const style =
+    document.createElement(
+      "style"
+    );
+
+  style.id =
+    "gng-dynamic-styles";
+
+  style.textContent = `
+    .booking-customer-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .booking-customer-field {
+      display: grid;
+      gap: 8px;
+    }
+
+    .booking-customer-field label {
+      color: var(--navy-deep);
+      font-size: .84rem;
+      font-weight: 800;
+    }
+
+    .booking-input {
+      width: 100%;
+      min-height: 58px;
+      padding: 0 16px;
+      border: 1px solid #c8d1dc;
+      border-radius: 14px;
+      background: var(--white);
+      color: var(--navy-deep);
+      font-size: 1rem;
+      font-weight: 700;
+    }
+
+    .booking-input:focus-visible {
+      outline: 4px solid rgba(34, 51, 79, .20);
+      outline-offset: 3px;
+      border-color: var(--navy);
+    }
+
+    .booking-field-hint {
+      margin: 4px 0 0;
+      color: var(--muted);
+      font-size: .78rem;
+    }
+
+    .booking-day.is-disabled,
+    .booking-day:disabled {
+      opacity: .48;
+      cursor: not-allowed;
+      background: #e5e8ec;
+      border-color: #d5d9df;
+      box-shadow: none;
+      transform: none;
+    }
+
+    .booking-time.is-occupied {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 9px;
+      background: #e6e8eb;
+      border-color: #cfd3d8;
+      color: #6e7680;
+      text-decoration: none;
+      opacity: 1;
+    }
+
+    .booking-time-value {
+      text-decoration: line-through;
+      opacity: .72;
+    }
+
+    .booking-time-status {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: #7d8794;
+      background: transparent;
+      font-size: 1rem;
+      font-weight: 900;
+      line-height: 1;
+      text-decoration: none;
+    }
+
+    .mobile-app-nav {
+      display: none;
+    }
+
+    .mobile-step-selection {
+      display: none;
+    }
+
+    @media (max-width: 680px) {
+      body {
+        padding-bottom:
+          calc(
+            88px +
+            env(
+              safe-area-inset-bottom,
+              0px
+            )
+          ) !important;
+      }
+
+      .mobile-booking {
+        display: none !important;
+      }
+
+      .mobile-app-nav {
+        position: fixed;
+        left: 8px;
+        right: 8px;
+        bottom:
+          calc(
+            7px +
+            env(
+              safe-area-inset-bottom,
+              0px
+            )
+          );
+        z-index: 1400;
+        display: grid;
+        grid-template-columns:
+          repeat(
+            4,
+            minmax(0, 1fr)
+          );
+        gap: 5px;
+        min-height: 62px;
+        padding: 6px;
+        border:
+          1px solid
+          rgba(
+            34,
+            51,
+            79,
+            .13
+          );
+        border-radius: 19px;
+        background:
+          rgba(
+            248,
+            249,
+            251,
+            .96
+          );
+        box-shadow:
+          0 16px 40px
+          rgba(
+            13,
+            23,
+            40,
+            .22
+          );
+        -webkit-backdrop-filter:
+          blur(18px);
+        backdrop-filter:
+          blur(18px);
+        transition:
+          opacity .2s ease,
+          transform .2s ease;
+      }
+
+      .mobile-app-nav a {
+        min-width: 0;
+        min-height: 48px;
+        padding: 6px 4px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        gap: 2px;
+        border-radius: 13px;
+        color: #697688;
+        font-size: .61rem;
+        font-weight: 800;
+        line-height: 1;
+        text-align: center;
+      }
+
+      .mobile-app-nav a span:first-child {
+        min-width: 25px;
+        height: 22px;
+        display: grid;
+        place-items: center;
+        color: currentColor;
+        font-family:
+          "Bebas Neue",
+          sans-serif;
+        font-size: .95rem;
+        letter-spacing: .02em;
+      }
+
+      .mobile-app-nav
+      a.is-active:not(.is-primary) {
+        background: #e7ebf1;
+        color: var(--navy-deep);
+      }
+
+      .mobile-app-nav a.is-primary {
+        background:
+          linear-gradient(
+            145deg,
+            var(--navy),
+            var(--navy-deep)
+          );
+        color: var(--white);
+        box-shadow:
+          0 8px 20px
+          rgba(
+            13,
+            23,
+            40,
+            .22
+          );
+      }
+
+      .mobile-app-nav
+      a.is-primary.is-active {
+        box-shadow:
+          0 8px 22px
+          rgba(
+            13,
+            23,
+            40,
+            .32
+          );
+      }
+
+      body.mobile-keyboard-open
+      .mobile-app-nav {
+        opacity: 0;
+        pointer-events: none;
+        transform:
+          translateY(120%);
+      }
+
+      .booking-step.is-mobile-collapsed {
+        padding-top: 12px;
+        padding-bottom: 12px;
+      }
+
+      .booking-step.is-mobile-collapsed
+      > :not(.booking-step-heading) {
+        display: none !important;
+      }
+
+      .booking-step.is-mobile-collapsed
+      .booking-step-heading {
+        margin-bottom: 0;
+      }
+
+      .booking-step.is-mobile-collapsed
+      .booking-step-heading
+      small:not(.mobile-step-selection) {
+        display: none;
+      }
+
+      .booking-step.is-mobile-complete
+      .booking-step-number {
+        background:
+          var(--success);
+      }
+
+      .booking-step.is-mobile-locked {
+        opacity: .52;
+      }
+
+      .booking-step.is-mobile-locked
+      .booking-step-number {
+        background: #8c96a4;
+      }
+
+      .booking-step.is-mobile-current {
+        border-color:
+          rgba(
+            34,
+            51,
+            79,
+            .28
+          );
+        box-shadow:
+          0 10px 30px
+          rgba(
+            13,
+            23,
+            40,
+            .10
+          );
+      }
+
+      .booking-step-heading
+      .mobile-step-clickable {
+        cursor: pointer;
+      }
+
+      .booking-step-heading.mobile-step-clickable {
+        cursor: pointer;
+      }
+
+      .booking-step.is-mobile-complete
+      .mobile-step-selection {
+        color: #657386;
+      }
+
+      .booking-step.is-mobile-complete
+      .booking-step-heading {
+        cursor: pointer;
+      }
+
+      .booking-step.is-mobile-complete
+      .booking-step-heading
+      .mobile-step-selection {
+        margin-top: 2px;
+      }
+
+      .booking-step.is-mobile-complete
+      .booking-step-heading
+      .mobile-step-selection {
+        font-size: .69rem;
+        font-weight: 700;
+        line-height: 1.25;
+      }
+
+      .booking-step.is-mobile-complete
+      .booking-step-heading
+      .mobile-step-selection {
+        display: none;
+      }
+
+      .booking-step.is-mobile-complete.is-mobile-collapsed
+      .mobile-step-selection {
+        display: block;
+      }
+
+      .booking-step.is-mobile-complete.is-mobile-collapsed
+      .booking-step-heading::after {
+        content: "Alterar";
+        margin-left: auto;
+        color: var(--navy);
+        font-size: .65rem;
+        font-weight: 800;
+      }
+
+      .booking-step.is-mobile-locked
+      .booking-step-heading::after {
+        content: "";
+      }
+
+      .booking-customer-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 370px) {
+      .mobile-app-nav a {
+        font-size: .56rem;
+      }
+    }
+  `;
+
+  document.head.appendChild(
+    style
+  );
+}
+
+function createMobileBottomNav() {
+  if (
+    document.getElementById(
+      "mobile-app-nav"
+    )
+  ) {
+    return;
+  }
+
+  const nav =
+    document.createElement(
+      "nav"
+    );
+
+  nav.id =
+    "mobile-app-nav";
+
+  nav.className =
+    "mobile-app-nav";
+
+  nav.setAttribute(
+    "aria-label",
+    "Navegação rápida"
+  );
+
+  nav.innerHTML = `
+    <a
+      href="#servicos"
+      data-mobile-nav="servicos"
+    >
+      <span>R$</span>
+      <span>Valores</span>
+    </a>
+
+    <a
+      href="#agendamento"
+      data-mobile-nav="agendamento"
+      class="is-primary"
+    >
+      <span>+</span>
+      <span>Agendar</span>
+    </a>
+
+    <a
+      href="#assinaturas"
+      data-mobile-nav="assinaturas"
+    >
+      <span>GNG</span>
+      <span>Planos</span>
+    </a>
+
+    <a
+      href="#localizacao"
+      data-mobile-nav="localizacao"
+    >
+      <span>DF</span>
+      <span>Local</span>
+    </a>
+  `;
+
+  document.body.appendChild(
+    nav
+  );
+}
+
+function updateMobileNavActiveState() {
+  const nav =
+    document.getElementById(
+      "mobile-app-nav"
+    );
+
+  if (
+    !nav ||
+    !isMobileLayout()
+  ) {
+    return;
+  }
+
+  const ids = [
+    "servicos",
+    "agendamento",
+    "assinaturas",
+    "localizacao"
+  ];
+
+  const marker =
+    window.scrollY +
+    window.innerHeight *
+      0.42;
+
+  let activeId =
+    "";
+
+  ids.forEach(
+    function (id) {
+      const section =
+        document.getElementById(
+          id
+        );
+
+      if (
+        section &&
+        section.offsetTop <=
+          marker
+      ) {
+        activeId =
+          id;
+      }
+    }
+  );
+
+  nav
+    .querySelectorAll(
+      "[data-mobile-nav]"
+    )
+    .forEach(
+      function (link) {
+        link.classList.toggle(
+          "is-active",
+          link.dataset.mobileNav ===
+            activeId
+        );
+      }
+    );
+}
+
+function setupMobileNavActiveTracking() {
+  const update =
+    function () {
+      if (
+        mobileNavTicking
+      ) {
+        return;
+      }
+
+      mobileNavTicking =
+        true;
+
+      window.requestAnimationFrame(
+        function () {
+          updateMobileNavActiveState();
+
+          mobileNavTicking =
+            false;
+        }
+      );
+    };
+
+  window.addEventListener(
+    "scroll",
+    update,
+    {
+      passive: true
+    }
+  );
+
+  window.addEventListener(
+    "resize",
+    update
+  );
+
+  update();
+}
+
+function setupKeyboardAwareMobileNav() {
+  const isTextField =
+    function (element) {
+      if (!element) {
+        return false;
+      }
+
+      return (
+        element.tagName ===
+          "INPUT" ||
+        element.tagName ===
+          "TEXTAREA" ||
+        element.isContentEditable
+      );
+    };
+
+  document.addEventListener(
+    "focusin",
+    function (event) {
+      if (
+        isMobileLayout() &&
+        isTextField(
+          event.target
+        )
+      ) {
+        document.body.classList.add(
+          "mobile-keyboard-open"
+        );
+      }
+    }
+  );
+
+  document.addEventListener(
+    "focusout",
+    function () {
+      window.setTimeout(
+        function () {
+          if (
+            !isTextField(
+              document.activeElement
+            )
+          ) {
+            document.body.classList.remove(
+              "mobile-keyboard-open"
+            );
+          }
+        },
+        120
+      );
+    }
+  );
+
+  if (
+    window.visualViewport
+  ) {
+    window.visualViewport.addEventListener(
+      "resize",
+      function () {
+        const active =
+          document.activeElement;
+
+        if (
+          !isTextField(
+            active
+          )
+        ) {
+          document.body.classList.remove(
+            "mobile-keyboard-open"
+          );
+
+          return;
+        }
+
+        const keyboardLikelyOpen =
+          window.visualViewport.height <
+          window.innerHeight *
+            0.8;
+
+        document.body.classList.toggle(
+          "mobile-keyboard-open",
+          isMobileLayout() &&
+            keyboardLikelyOpen
+        );
+      }
     );
   }
 }
@@ -655,7 +1318,8 @@ function getBusinessDateParts() {
       }
     );
 
-  const result = {};
+  const result =
+    {};
 
   formatter
     .formatToParts(
@@ -758,13 +1422,15 @@ function addDays(
 
   result.setUTCDate(
     result.getUTCDate() +
-    amount
+      amount
   );
 
   return result;
 }
 
-function dateToKey(date) {
+function dateToKey(
+  date
+) {
   return buildDateKey(
     date.getUTCFullYear(),
     date.getUTCMonth() + 1,
@@ -772,7 +1438,9 @@ function dateToKey(date) {
   );
 }
 
-function formatWeekday(date) {
+function formatWeekday(
+  date
+) {
   return new Intl.DateTimeFormat(
     "pt-BR",
     {
@@ -792,7 +1460,9 @@ function formatWeekday(date) {
     );
 }
 
-function formatMonth(date) {
+function formatMonth(
+  date
+) {
   return new Intl.DateTimeFormat(
     "pt-BR",
     {
@@ -812,7 +1482,9 @@ function formatMonth(date) {
     );
 }
 
-function formatFullDate(date) {
+function formatFullDate(
+  date
+) {
   return new Intl.DateTimeFormat(
     "pt-BR",
     {
@@ -834,6 +1506,31 @@ function formatFullDate(date) {
   ).format(
     date
   );
+}
+
+function formatShortDate(
+  date
+) {
+  return new Intl.DateTimeFormat(
+    "pt-BR",
+    {
+      day:
+        "2-digit",
+
+      month:
+        "short",
+
+      timeZone:
+        "UTC"
+    }
+  )
+    .format(
+      date
+    )
+    .replace(
+      ".",
+      ""
+    );
 }
 
 function capitalizeFirst(
@@ -884,7 +1581,9 @@ function getCurrentMinutes() {
   );
 }
 
-function timeToMinutes(time) {
+function timeToMinutes(
+  time
+) {
   if (!time) {
     return 0;
   }
@@ -923,7 +1622,8 @@ function normalizeDatabaseTime(
 }
 
 function generateSlots() {
-  const slots = [];
+  const slots =
+    [];
 
   const start =
     SLOT_START_HOUR *
@@ -938,15 +1638,18 @@ function generateSlots() {
   for (
     let minutes = start;
     minutes <= end;
-    minutes += SLOT_INTERVAL
+    minutes +=
+      SLOT_INTERVAL
   ) {
     const hour =
       Math.floor(
-        minutes / 60
+        minutes /
+          60
       );
 
     const minute =
-      minutes % 60;
+      minutes %
+      60;
 
     slots.push({
       value:
@@ -965,16 +1668,9 @@ function generateSlots() {
   return slots;
 }
 
-function digitsOnly(value) {
-  return String(
-    value || ""
-  ).replace(
-    /\D/g,
-    ""
-  );
-}
-
-function isValidName(value) {
+function isValidName(
+  value
+) {
   const name =
     String(
       value || ""
@@ -986,7 +1682,9 @@ function isValidName(value) {
   );
 }
 
-function isValidPhone(value) {
+function isValidPhone(
+  value
+) {
   const digits =
     digitsOnly(
       value
@@ -998,7 +1696,9 @@ function isValidPhone(value) {
   );
 }
 
-function formatPhoneInput(value) {
+function formatPhoneInput(
+  value
+) {
   const digits =
     digitsOnly(
       value
@@ -1075,8 +1775,8 @@ async function supabaseRpc(
   const response =
     await fetch(
       SUPABASE_URL +
-      "/rest/v1/rpc/" +
-      functionName,
+        "/rest/v1/rpc/" +
+        functionName,
       {
         method:
           "POST",
@@ -1105,7 +1805,8 @@ async function supabaseRpc(
       "content-type"
     );
 
-  let data = null;
+  let data =
+    null;
 
   if (
     contentType &&
@@ -1142,118 +1843,6 @@ async function supabaseRpc(
   }
 
   return data;
-}
-
-function injectBookingStyles() {
-  if (
-    document.getElementById(
-      "gng-booking-database-styles"
-    )
-  ) {
-    return;
-  }
-
-  const style =
-    document.createElement(
-      "style"
-    );
-
-  style.id =
-    "gng-booking-database-styles";
-
-  style.textContent = `
-    .booking-customer-grid {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 12px;
-    }
-
-    .booking-customer-field {
-      display: grid;
-      gap: 8px;
-    }
-
-    .booking-customer-field label {
-      color: var(--navy-deep);
-      font-size: .84rem;
-      font-weight: 800;
-    }
-
-    .booking-input {
-      width: 100%;
-      min-height: 58px;
-      padding: 0 16px;
-      border: 1px solid #c8d1dc;
-      border-radius: 14px;
-      background: var(--white);
-      color: var(--navy-deep);
-      font-size: 1rem;
-      font-weight: 700;
-    }
-
-    .booking-input:focus-visible {
-      outline: 4px solid rgba(34, 51, 79, .20);
-      outline-offset: 3px;
-      border-color: var(--navy);
-    }
-
-    .booking-field-hint {
-      margin: 4px 0 0;
-      color: var(--muted);
-      font-size: .78rem;
-    }
-
-    .booking-day.is-disabled,
-    .booking-day:disabled {
-      opacity: .48;
-      cursor: not-allowed;
-      background: #e5e8ec;
-      border-color: #d5d9df;
-      box-shadow: none;
-      transform: none;
-    }
-
-    .booking-time.is-occupied {
-      position: relative;
-      min-height: 58px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 9px;
-      background: #e6e8eb;
-      border-color: #cfd3d8;
-      color: #6e7680;
-      text-decoration: none;
-      opacity: 1;
-    }
-
-    .booking-time-value {
-      text-decoration: line-through;
-      opacity: .72;
-    }
-
-    .booking-time-status {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      color: #7d8794;
-      background: transparent;
-      font-size: 1rem;
-      font-weight: 900;
-      line-height: 1;
-      text-decoration: none;
-    }
-
-    @media (max-width: 640px) {
-      .booking-customer-grid {
-        grid-template-columns: 1fr;
-      }
-    }
-  `;
-
-  document.head.appendChild(
-    style
-  );
 }
 
 function createBarberStep() {
@@ -1349,6 +1938,13 @@ function createBarberStep() {
       ".booking-step-number"
     );
 
+  const timeNumber =
+    timeStep
+      ? timeStep.querySelector(
+          ".booking-step-number"
+        )
+      : null;
+
   if (
     dayNumber
   ) {
@@ -1357,19 +1953,10 @@ function createBarberStep() {
   }
 
   if (
-    timeStep
+    timeNumber
   ) {
-    const timeNumber =
-      timeStep.querySelector(
-        ".booking-step-number"
-      );
-
-    if (
-      timeNumber
-    ) {
-      timeNumber.textContent =
-        "04";
-    }
+    timeNumber.textContent =
+      "04";
   }
 
   createCustomerStep(
@@ -1377,6 +1964,7 @@ function createBarberStep() {
   );
 
   createBarberSummary();
+
   createCustomerSummary();
 }
 
@@ -1480,7 +2068,10 @@ function createCustomerStep(
     "input",
     function () {
       updateCustomerSummary();
+
       updateSubmitState();
+
+      syncMobileBookingFlow();
     }
   );
 
@@ -1506,6 +2097,8 @@ function createCustomerStep(
       }
 
       updateSubmitState();
+
+      syncMobileBookingFlow();
     }
   );
 }
@@ -1619,6 +2212,545 @@ function createCustomerSummary() {
     document.getElementById(
       "summary-customer"
     );
+}
+
+function getBookingSteps() {
+  const serviceStep =
+    bookingService
+      ? bookingService.closest(
+          ".booking-step"
+        )
+      : null;
+
+  const barberStep =
+    bookingBarber
+      ? bookingBarber.closest(
+          ".booking-step"
+        )
+      : null;
+
+  const dayStep =
+    bookingDays
+      ? bookingDays.closest(
+          ".booking-step"
+        )
+      : null;
+
+  const timeStep =
+    bookingTimes
+      ? bookingTimes.closest(
+          ".booking-step"
+        )
+      : null;
+
+  const customerStep =
+    bookingCustomerName
+      ? bookingCustomerName.closest(
+          ".booking-step"
+        )
+      : null;
+
+  return [
+    serviceStep,
+    barberStep,
+    dayStep,
+    timeStep,
+    customerStep
+  ];
+}
+
+function getMobileBookingCurrentStep() {
+  if (
+    !bookingService ||
+    !bookingService.value
+  ) {
+    return 0;
+  }
+
+  if (
+    !selectedBarberId
+  ) {
+    return 1;
+  }
+
+  if (
+    !selectedDate
+  ) {
+    return 2;
+  }
+
+  if (
+    !selectedTime
+  ) {
+    return 3;
+  }
+
+  return 4;
+}
+
+function getMobileStepSummary(
+  index
+) {
+  if (
+    index === 0
+  ) {
+    return (
+      bookingService &&
+      bookingService.value
+        ? bookingService.value
+        : ""
+    );
+  }
+
+  if (
+    index === 1
+  ) {
+    return (
+      selectedBarberName ||
+      ""
+    );
+  }
+
+  if (
+    index === 2
+  ) {
+    return selectedDate
+      ? capitalizeFirst(
+          formatShortDate(
+            selectedDate
+          )
+        )
+      : "";
+  }
+
+  if (
+    index === 3
+  ) {
+    return (
+      selectedTime ||
+      ""
+    );
+  }
+
+  if (
+    index === 4
+  ) {
+    const name =
+      bookingCustomerName
+        ? bookingCustomerName
+            .value
+            .trim()
+        : "";
+
+    const phone =
+      bookingCustomerPhone
+        ? bookingCustomerPhone
+            .value
+            .trim()
+        : "";
+
+    if (
+      name &&
+      phone
+    ) {
+      return (
+        name +
+        " • " +
+        phone
+      );
+    }
+
+    return (
+      name ||
+      phone ||
+      ""
+    );
+  }
+
+  return "";
+}
+
+function scrollToBookingStep(
+  index
+) {
+  if (
+    !isMobileLayout()
+  ) {
+    return;
+  }
+
+  const step =
+    getBookingSteps()[
+      index
+    ];
+
+  if (!step) {
+    return;
+  }
+
+  window.setTimeout(
+    function () {
+      const top =
+        step
+          .getBoundingClientRect()
+          .top +
+        window.scrollY -
+        76;
+
+      window.scrollTo({
+        top:
+          Math.max(
+            0,
+            top
+          ),
+
+        behavior:
+          window.matchMedia(
+            "(prefers-reduced-motion: reduce)"
+          ).matches
+            ? "auto"
+            : "smooth"
+      });
+    },
+    80
+  );
+}
+
+function syncMobileBookingFlow() {
+  const steps =
+    getBookingSteps();
+
+  if (
+    steps.some(
+      function (step) {
+        return !step;
+      }
+    )
+  ) {
+    return;
+  }
+
+  const naturalCurrent =
+    getMobileBookingCurrentStep();
+
+  const maxUnlocked =
+    naturalCurrent;
+
+  if (
+    !isMobileLayout()
+  ) {
+    steps.forEach(
+      function (step) {
+        step.classList.remove(
+          "is-mobile-current",
+          "is-mobile-complete",
+          "is-mobile-locked",
+          "is-mobile-collapsed"
+        );
+
+        const heading =
+          step.querySelector(
+            ".booking-step-heading"
+          );
+
+        if (
+          heading
+        ) {
+          heading.classList.remove(
+            "mobile-step-clickable"
+          );
+
+          heading.removeAttribute(
+            "role"
+          );
+
+          heading.removeAttribute(
+            "tabindex"
+          );
+
+          heading.removeAttribute(
+            "aria-expanded"
+          );
+        }
+      }
+    );
+
+    return;
+  }
+
+  if (
+    mobileBookingOpenStep ===
+      null ||
+    mobileBookingOpenStep >
+      maxUnlocked ||
+    mobileBookingOpenStep <
+      0
+  ) {
+    mobileBookingOpenStep =
+      naturalCurrent;
+  }
+
+  steps.forEach(
+    function (
+      step,
+      index
+    ) {
+      const heading =
+        step.querySelector(
+          ".booking-step-heading"
+        );
+
+      const headingText =
+        heading
+          ? heading.querySelector(
+              "div"
+            )
+          : null;
+
+      const isUnlocked =
+        index <=
+        maxUnlocked;
+
+      const isCurrent =
+        index ===
+        mobileBookingOpenStep;
+
+      const isComplete =
+        index <
+          naturalCurrent ||
+        (
+          index === 4 &&
+          bookingSubmit &&
+          !bookingSubmit.disabled
+        );
+
+      step.dataset.mobileStep =
+        String(
+          index
+        );
+
+      step.classList.toggle(
+        "is-mobile-current",
+        isCurrent
+      );
+
+      step.classList.toggle(
+        "is-mobile-complete",
+        isComplete
+      );
+
+      step.classList.toggle(
+        "is-mobile-locked",
+        !isUnlocked
+      );
+
+      step.classList.toggle(
+        "is-mobile-collapsed",
+        !isCurrent
+      );
+
+      if (
+        !heading
+      ) {
+        return;
+      }
+
+      let selection =
+        heading.querySelector(
+          ".mobile-step-selection"
+        );
+
+      if (
+        !selection &&
+        headingText
+      ) {
+        selection =
+          document.createElement(
+            "span"
+          );
+
+        selection.className =
+          "mobile-step-selection";
+
+        headingText.appendChild(
+          selection
+        );
+      }
+
+      if (
+        selection
+      ) {
+        selection.textContent =
+          getMobileStepSummary(
+            index
+          );
+      }
+
+      heading.classList.toggle(
+        "mobile-step-clickable",
+        isUnlocked
+      );
+
+      heading.setAttribute(
+        "aria-expanded",
+        isCurrent
+          ? "true"
+          : "false"
+      );
+
+      if (
+        isUnlocked
+      ) {
+        heading.setAttribute(
+          "role",
+          "button"
+        );
+
+        heading.setAttribute(
+          "tabindex",
+          "0"
+        );
+
+      } else {
+        heading.removeAttribute(
+          "role"
+        );
+
+        heading.removeAttribute(
+          "tabindex"
+        );
+      }
+    }
+  );
+}
+
+function setMobileBookingStep(
+  index,
+  shouldScroll = false
+) {
+  if (
+    !isMobileLayout()
+  ) {
+    syncMobileBookingFlow();
+
+    return;
+  }
+
+  const maxUnlocked =
+    getMobileBookingCurrentStep();
+
+  mobileBookingOpenStep =
+    Math.max(
+      0,
+      Math.min(
+        index,
+        maxUnlocked
+      )
+    );
+
+  syncMobileBookingFlow();
+
+  if (
+    shouldScroll
+  ) {
+    scrollToBookingStep(
+      mobileBookingOpenStep
+    );
+  }
+}
+
+function advanceMobileBookingFlow(
+  shouldScroll = true
+) {
+  setMobileBookingStep(
+    getMobileBookingCurrentStep(),
+    shouldScroll
+  );
+}
+
+function setupMobileBookingFlow() {
+  const steps =
+    getBookingSteps();
+
+  if (
+    steps.some(
+      function (step) {
+        return !step;
+      }
+    )
+  ) {
+    return;
+  }
+
+  steps.forEach(
+    function (
+      step,
+      index
+    ) {
+      const heading =
+        step.querySelector(
+          ".booking-step-heading"
+        );
+
+      if (
+        !heading ||
+        heading.dataset.mobileFlowReady ===
+          "true"
+      ) {
+        return;
+      }
+
+      heading.dataset.mobileFlowReady =
+        "true";
+
+      const openStep =
+        function () {
+          if (
+            !isMobileLayout()
+          ) {
+            return;
+          }
+
+          const maxUnlocked =
+            getMobileBookingCurrentStep();
+
+          if (
+            index >
+            maxUnlocked
+          ) {
+            return;
+          }
+
+          setMobileBookingStep(
+            index,
+            true
+          );
+        };
+
+      heading.addEventListener(
+        "click",
+        openStep
+      );
+
+      heading.addEventListener(
+        "keydown",
+        function (event) {
+          if (
+            event.key ===
+              "Enter" ||
+            event.key ===
+              " "
+          ) {
+            event.preventDefault();
+
+            openStep();
+          }
+        }
+      );
+    }
+  );
+
+  syncMobileBookingFlow();
 }
 
 async function loadBarbers() {
@@ -1871,6 +3003,8 @@ async function loadBookedSlots() {
 
     updateSubmitState();
 
+    syncMobileBookingFlow();
+
     return;
   }
 
@@ -1884,6 +3018,8 @@ async function loadBookedSlots() {
     );
 
     updateSubmitState();
+
+    syncMobileBookingFlow();
 
     return;
   }
@@ -1962,6 +3098,8 @@ async function loadBookedSlots() {
     }
 
     updateSubmitState();
+
+    syncMobileBookingFlow();
 
   } catch (error) {
     console.error(
@@ -2095,6 +3233,45 @@ function updateSubmitState() {
     );
 }
 
+function markSelectedDate() {
+  if (
+    !bookingDays
+  ) {
+    return;
+  }
+
+  const selectedKey =
+    selectedDate
+      ? dateToKey(
+          selectedDate
+        )
+      : "";
+
+  Array.from(
+    bookingDays.querySelectorAll(
+      ".booking-day"
+    )
+  ).forEach(
+    function (button) {
+      const active =
+        button.dataset.date ===
+        selectedKey;
+
+      button.classList.toggle(
+        "is-selected",
+        active
+      );
+
+      button.setAttribute(
+        "aria-pressed",
+        active
+          ? "true"
+          : "false"
+      );
+    }
+  );
+}
+
 function renderDays() {
   if (
     !bookingDays
@@ -2123,6 +3300,13 @@ function renderDays() {
     return;
   }
 
+  const previousDateKey =
+    selectedDate
+      ? dateToKey(
+          selectedDate
+        )
+      : "";
+
   bookingDays.innerHTML =
     "";
 
@@ -2133,6 +3317,9 @@ function renderDays() {
     dateToKey(
       today
     );
+
+  let selectedDateStillAvailable =
+    false;
 
   let firstAvailableDate =
     null;
@@ -2211,11 +3398,20 @@ function renderDays() {
     }
 
     if (
-      !firstAvailableDate &&
-      available
+      available &&
+      !firstAvailableDate
     ) {
       firstAvailableDate =
         date;
+    }
+
+    if (
+      available &&
+      dateKey ===
+        previousDateKey
+    ) {
+      selectedDateStillAvailable =
+        true;
     }
 
     button.addEventListener(
@@ -2238,48 +3434,65 @@ function renderDays() {
 
   if (
     selectedDate &&
-    hasAvailableTime(
-      dateToKey(
-        selectedDate
-      )
-    )
+    selectedDateStillAvailable
   ) {
-    selectDate(
+    markSelectedDate();
+
+    updateDateSummary(
       selectedDate
     );
 
-    return;
-  }
+    renderTimes();
 
-  if (
+  } else if (
+    !isMobileLayout() &&
     firstAvailableDate
   ) {
-    selectDate(
-      firstAvailableDate
+    selectedDate =
+      new Date(
+        firstAvailableDate.getTime()
+      );
+
+    selectedTime =
+      null;
+
+    markSelectedDate();
+
+    updateDateSummary(
+      selectedDate
     );
 
-    return;
+    updateTimeSummary();
+
+    renderTimes();
+
+  } else {
+    selectedDate =
+      null;
+
+    selectedTime =
+      null;
+
+    updateDateSummary(
+      null
+    );
+
+    updateTimeSummary();
+
+    bookingTimes.innerHTML =
+      '<div class="booking-empty">' +
+      "Escolha um dia para visualizar os horários." +
+      "</div>";
   }
 
-  selectedDate =
-    null;
+  updateSubmitState();
 
-  selectedTime =
-    null;
-
-  updateDateSummary(
-    null
-  );
-
-  updateTimeSummary();
-
-  bookingTimes.innerHTML =
-    '<div class="booking-empty">' +
-    "Este barbeiro não possui horários disponíveis neste período para esse serviço." +
-    "</div>";
+  syncMobileBookingFlow();
 }
 
-function selectDate(date) {
+function selectDate(
+  date
+) {
   selectedDate =
     new Date(
       date.getTime()
@@ -2288,34 +3501,7 @@ function selectDate(date) {
   selectedTime =
     null;
 
-  const selectedKey =
-    dateToKey(
-      selectedDate
-    );
-
-  Array.from(
-    bookingDays.querySelectorAll(
-      ".booking-day"
-    )
-  ).forEach(
-    function (button) {
-      const active =
-        button.dataset.date ===
-        selectedKey;
-
-      button.classList.toggle(
-        "is-selected",
-        active
-      );
-
-      button.setAttribute(
-        "aria-pressed",
-        active
-          ? "true"
-          : "false"
-      );
-    }
-  );
+  markSelectedDate();
 
   updateDateSummary(
     selectedDate
@@ -2326,6 +3512,10 @@ function selectDate(date) {
   renderTimes();
 
   updateSubmitState();
+
+  advanceMobileBookingFlow(
+    true
+  );
 }
 
 function renderTimes() {
@@ -2537,7 +3727,8 @@ function selectTime(
   ).forEach(
     function (item) {
       const active =
-        item === button;
+        item ===
+        button;
 
       item.classList.toggle(
         "is-selected",
@@ -2554,7 +3745,12 @@ function selectTime(
   );
 
   updateTimeSummary();
+
   updateSubmitState();
+
+  advanceMobileBookingFlow(
+    true
+  );
 }
 
 async function handleBarberChange() {
@@ -2601,6 +3797,8 @@ async function handleBarberChange() {
       "Escolha um serviço para visualizar a disponibilidade."
     );
 
+    syncMobileBookingFlow();
+
     return;
   }
 
@@ -2610,6 +3808,8 @@ async function handleBarberChange() {
     showSelectionRequiredState(
       "Escolha um barbeiro para visualizar a disponibilidade."
     );
+
+    syncMobileBookingFlow();
 
     return;
   }
@@ -2627,6 +3827,10 @@ async function handleBarberChange() {
   await loadBookedSlots();
 
   renderDays();
+
+  advanceMobileBookingFlow(
+    true
+  );
 }
 
 async function handleServiceChange() {
@@ -2655,6 +3859,11 @@ async function handleServiceChange() {
 
     updateSubmitState();
 
+    setMobileBookingStep(
+      0,
+      false
+    );
+
     return;
   }
 
@@ -2666,6 +3875,10 @@ async function handleServiceChange() {
     );
 
     updateSubmitState();
+
+    advanceMobileBookingFlow(
+      true
+    );
 
     return;
   }
@@ -2683,6 +3896,10 @@ async function handleServiceChange() {
   await loadBookedSlots();
 
   renderDays();
+
+  advanceMobileBookingFlow(
+    true
+  );
 }
 
 function findServiceOption(
@@ -2870,6 +4087,7 @@ function sendWhatsappToWindow(
 
     try {
       preparedWindow.focus();
+
     } catch (error) {
       console.error(
         error
@@ -3035,6 +4253,10 @@ async function submitBooking() {
 
     updateSubmitState();
 
+    advanceMobileBookingFlow(
+      false
+    );
+
   } catch (error) {
     if (
       whatsappWindow &&
@@ -3065,6 +4287,10 @@ async function submitBooking() {
 
     renderTimes();
 
+    advanceMobileBookingFlow(
+      false
+    );
+
   } finally {
     bookingRequestInProgress =
       false;
@@ -3078,6 +4304,8 @@ async function submitBooking() {
     }
 
     updateSubmitState();
+
+    syncMobileBookingFlow();
   }
 }
 
@@ -3090,9 +4318,9 @@ async function setupBooking() {
     return;
   }
 
-  injectBookingStyles();
-
   createBarberStep();
+
+  setupMobileBookingFlow();
 
   bookingService.addEventListener(
     "change",
@@ -3120,7 +4348,9 @@ async function setupBooking() {
   setupServiceLinks();
 
   updateServiceSummary();
+
   updateBarberSummary();
+
   updateCustomerSummary();
 
   updateDateSummary(
@@ -3136,6 +4366,8 @@ async function setupBooking() {
   await loadBarbers();
 
   updateSubmitState();
+
+  syncMobileBookingFlow();
 }
 
 function setupInternalLinks() {
@@ -3174,6 +4406,13 @@ function setupInternalLinks() {
           event.preventDefault();
 
           closeMenu();
+
+          if (
+            href ===
+            "#agendamento"
+          ) {
+            syncMobileBookingFlow();
+          }
 
           target.scrollIntoView({
             behavior:
@@ -3225,6 +4464,8 @@ function refreshCurrentDayState() {
   }
 
   updateSubmitState();
+
+  syncMobileBookingFlow();
 }
 
 async function refreshAvailability() {
@@ -3243,19 +4484,40 @@ async function refreshAvailability() {
 
 function refreshDeviceSettings() {
   setupDeviceDetection();
+
   setupDeviceAwareWhatsappLinks();
+
+  syncMobileBookingFlow();
+
+  updateMobileNavActiveState();
+
+  if (
+    !isMobileLayout()
+  ) {
+    document.body.classList.remove(
+      "mobile-keyboard-open"
+    );
+  }
 }
 
 function initializeSite() {
   setupDeviceDetection();
 
+  injectDynamicStyles();
+
   setupMenu();
 
   setupMobileServices();
 
+  createMobileBottomNav();
+
   setupInternalLinks();
 
   setupDeviceAwareWhatsappLinks();
+
+  setupMobileNavActiveTracking();
+
+  setupKeyboardAwareMobileNav();
 
   setupBooking();
 
