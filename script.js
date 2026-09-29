@@ -12,131 +12,558 @@ const summaryPrice = document.getElementById("summary-price");
 const summaryDate = document.getElementById("summary-date");
 const summaryTime = document.getElementById("summary-time");
 
-const serviceLinks = Array.from(document.querySelectorAll("[data-service-link]"));
+const serviceLinks = Array.from(
+  document.querySelectorAll("[data-service-link]")
+);
 
 const WHATSAPP_NUMBER = "5561994075539";
-const SUPABASE_URL = "https://ueqfokfnjsjgocotvdae.supabase.co";
-const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_YqWCSylIzOdQcxuJFpE9dQ_3mVV4oji";
-const BUSINESS_TIMEZONE = "America/Sao_Paulo";
+
+const SUPABASE_URL =
+  "https://ueqfokfnjsjgocotvdae.supabase.co";
+
+const SUPABASE_PUBLISHABLE_KEY =
+  "sb_publishable_YqWCSylIzOdQcxuJFpE9dQ_3mVV4oji";
+
+const BUSINESS_TIMEZONE =
+  "America/Sao_Paulo";
+
 const SLOT_START_HOUR = 9;
 const SLOT_START_MINUTE = 0;
+
 const SLOT_END_HOUR = 19;
 const SLOT_END_MINUTE = 30;
+
 const SLOT_INTERVAL = 30;
 const BOOKING_DAYS_COUNT = 7;
+
+const MOBILE_BREAKPOINT = 680;
+const MOBILE_SERVICES_VISIBLE_COUNT = 5;
 
 let bookingBarber = null;
 let bookingCustomerName = null;
 let bookingCustomerPhone = null;
+
 let summaryBarber = null;
 let summaryCustomer = null;
+
 let barbers = [];
+
 let selectedBarberId = null;
 let selectedBarberName = "";
+
 let selectedDate = null;
 let selectedTime = null;
+
 let blockedSlots = new Map();
+
 let bookingRequestInProgress = false;
 
+let mobileServicesExpanded = false;
+let servicesToggleButton = null;
+
 if (year) {
-  year.textContent = new Date().getFullYear();
+  year.textContent =
+    new Date().getFullYear();
+}
+
+function setupDeviceDetection() {
+  const userAgent =
+    navigator.userAgent || "";
+
+  const platform =
+    navigator.platform || "";
+
+  const touchPoints =
+    navigator.maxTouchPoints || 0;
+
+  const isIPadDesktopMode =
+    platform === "MacIntel" &&
+    touchPoints > 1;
+
+  const isIOS =
+    /iPhone|iPad|iPod/i.test(
+      userAgent
+    ) ||
+    isIPadDesktopMode;
+
+  const isAndroid =
+    /Android/i.test(
+      userAgent
+    );
+
+  const isMobileViewport =
+    window.matchMedia(
+      `(max-width: ${MOBILE_BREAKPOINT}px)`
+    ).matches;
+
+  const root =
+    document.documentElement;
+
+  root.classList.remove(
+    "device-ios",
+    "device-android",
+    "device-mobile",
+    "device-desktop"
+  );
+
+  if (isIOS) {
+    root.classList.add(
+      "device-ios"
+    );
+
+    root.dataset.device =
+      "ios";
+
+    return;
+  }
+
+  if (isAndroid) {
+    root.classList.add(
+      "device-android"
+    );
+
+    root.dataset.device =
+      "android";
+
+    return;
+  }
+
+  if (isMobileViewport) {
+    root.classList.add(
+      "device-mobile"
+    );
+
+    root.dataset.device =
+      "mobile";
+
+    return;
+  }
+
+  root.classList.add(
+    "device-desktop"
+  );
+
+  root.dataset.device =
+    "desktop";
 }
 
 function closeMenu() {
-  if (!menuToggle || !mainNav) return;
+  if (
+    !menuToggle ||
+    !mainNav
+  ) {
+    return;
+  }
 
-  mainNav.classList.remove("is-open");
-  menuToggle.classList.remove("is-active");
+  mainNav.classList.remove(
+    "is-open"
+  );
 
-  menuToggle.setAttribute("aria-expanded", "false");
-  menuToggle.setAttribute("aria-label", "Abrir menu");
+  menuToggle.classList.remove(
+    "is-active"
+  );
 
-  document.body.classList.remove("menu-open");
+  menuToggle.setAttribute(
+    "aria-expanded",
+    "false"
+  );
+
+  menuToggle.setAttribute(
+    "aria-label",
+    "Abrir menu"
+  );
+
+  document.body.classList.remove(
+    "menu-open"
+  );
 }
 
 function openMenu() {
-  if (!menuToggle || !mainNav) return;
+  if (
+    !menuToggle ||
+    !mainNav
+  ) {
+    return;
+  }
 
-  mainNav.classList.add("is-open");
-  menuToggle.classList.add("is-active");
+  mainNav.classList.add(
+    "is-open"
+  );
 
-  menuToggle.setAttribute("aria-expanded", "true");
-  menuToggle.setAttribute("aria-label", "Fechar menu");
+  menuToggle.classList.add(
+    "is-active"
+  );
 
-  document.body.classList.add("menu-open");
+  menuToggle.setAttribute(
+    "aria-expanded",
+    "true"
+  );
+
+  menuToggle.setAttribute(
+    "aria-label",
+    "Fechar menu"
+  );
+
+  document.body.classList.add(
+    "menu-open"
+  );
 }
 
 function setupMenu() {
-  if (!menuToggle || !mainNav) return;
+  if (
+    !menuToggle ||
+    !mainNav
+  ) {
+    return;
+  }
 
-  menuToggle.addEventListener("click", function () {
-    if (mainNav.classList.contains("is-open")) {
-      closeMenu();
-    } else {
-      openMenu();
+  menuToggle.addEventListener(
+    "click",
+    function () {
+      if (
+        mainNav.classList.contains(
+          "is-open"
+        )
+      ) {
+        closeMenu();
+      } else {
+        openMenu();
+      }
     }
-  });
+  );
 
-  mainNav.querySelectorAll('a[href^="#"]').forEach(function (link) {
-    link.addEventListener("click", closeMenu);
-  });
+  mainNav
+    .querySelectorAll(
+      'a[href^="#"]'
+    )
+    .forEach(
+      function (link) {
+        link.addEventListener(
+          "click",
+          closeMenu
+        );
+      }
+    );
 
-  document.addEventListener("click", function (event) {
-    if (!mainNav.classList.contains("is-open")) return;
+  document.addEventListener(
+    "click",
+    function (event) {
+      if (
+        !mainNav.classList.contains(
+          "is-open"
+        )
+      ) {
+        return;
+      }
 
-    if (
-      mainNav.contains(event.target) ||
-      menuToggle.contains(event.target)
-    ) {
+      if (
+        mainNav.contains(
+          event.target
+        ) ||
+        menuToggle.contains(
+          event.target
+        )
+      ) {
+        return;
+      }
+
+      closeMenu();
+    }
+  );
+
+  document.addEventListener(
+    "keydown",
+    function (event) {
+      if (
+        event.key ===
+        "Escape"
+      ) {
+        closeMenu();
+      }
+    }
+  );
+
+  window.addEventListener(
+    "resize",
+    function () {
+      if (
+        window.innerWidth >
+        860
+      ) {
+        closeMenu();
+      }
+    }
+  );
+}
+
+function setupMobileServices() {
+  const servicesSection =
+    document.getElementById(
+      "servicos"
+    );
+
+  if (!servicesSection) {
+    return;
+  }
+
+  const tableBody =
+    servicesSection.querySelector(
+      ".price-table tbody"
+    );
+
+  const tableShell =
+    servicesSection.querySelector(
+      ".price-table-shell"
+    );
+
+  if (
+    !tableBody ||
+    !tableShell
+  ) {
+    return;
+  }
+
+  const rows =
+    Array.from(
+      tableBody.querySelectorAll(
+        "tr"
+      )
+    );
+
+  if (
+    rows.length <=
+    MOBILE_SERVICES_VISIBLE_COUNT
+  ) {
+    return;
+  }
+
+  const existingButton =
+    document.getElementById(
+      "mobile-services-toggle"
+    );
+
+  if (existingButton) {
+    servicesToggleButton =
+      existingButton;
+  } else {
+    const button =
+      document.createElement(
+        "button"
+      );
+
+    button.type =
+      "button";
+
+    button.id =
+      "mobile-services-toggle";
+
+    button.className =
+      "btn btn-secondary full";
+
+    button.style.marginTop =
+      "12px";
+
+    button.style.minHeight =
+      "46px";
+
+    button.style.fontSize =
+      "0.84rem";
+
+    button.setAttribute(
+      "aria-expanded",
+      "false"
+    );
+
+    button.setAttribute(
+      "aria-controls",
+      "services-mobile-list"
+    );
+
+    tableBody.id =
+      "services-mobile-list";
+
+    tableShell.insertAdjacentElement(
+      "afterend",
+      button
+    );
+
+    servicesToggleButton =
+      button;
+
+    button.addEventListener(
+      "click",
+      function () {
+        mobileServicesExpanded =
+          !mobileServicesExpanded;
+
+        updateMobileServices();
+      }
+    );
+  }
+
+  function updateMobileServices() {
+    const isMobile =
+      window.matchMedia(
+        `(max-width: ${MOBILE_BREAKPOINT}px)`
+      ).matches;
+
+    if (!isMobile) {
+      rows.forEach(
+        function (row) {
+          row.hidden =
+            false;
+        }
+      );
+
+      if (
+        servicesToggleButton
+      ) {
+        servicesToggleButton.style.display =
+          "none";
+      }
+
       return;
     }
 
-    closeMenu();
-  });
-
-  document.addEventListener("keydown", function (event) {
-    if (event.key === "Escape") {
-      closeMenu();
+    if (
+      servicesToggleButton
+    ) {
+      servicesToggleButton.style.display =
+        "inline-flex";
     }
-  });
 
-  window.addEventListener("resize", function () {
-    if (window.innerWidth > 860) {
-      closeMenu();
+    rows.forEach(
+      function (
+        row,
+        index
+      ) {
+        const shouldHide =
+          !mobileServicesExpanded &&
+          index >=
+            MOBILE_SERVICES_VISIBLE_COUNT;
+
+        row.hidden =
+          shouldHide;
+      }
+    );
+
+    if (
+      servicesToggleButton
+    ) {
+      servicesToggleButton.textContent =
+        mobileServicesExpanded
+          ? "Mostrar menos"
+          : "Ver todos os serviços (" +
+            rows.length +
+            ")";
+
+      servicesToggleButton.setAttribute(
+        "aria-expanded",
+        mobileServicesExpanded
+          ? "true"
+          : "false"
+      );
     }
-  });
+  }
+
+  updateMobileServices();
+
+  const mediaQuery =
+    window.matchMedia(
+      `(max-width: ${MOBILE_BREAKPOINT}px)`
+    );
+
+  if (
+    typeof mediaQuery.addEventListener ===
+    "function"
+  ) {
+    mediaQuery.addEventListener(
+      "change",
+      updateMobileServices
+    );
+  } else if (
+    typeof mediaQuery.addListener ===
+    "function"
+  ) {
+    mediaQuery.addListener(
+      updateMobileServices
+    );
+  }
 }
 
 function getBusinessDateParts() {
-  const formatter = new Intl.DateTimeFormat("en-CA", {
-    timeZone: BUSINESS_TIMEZONE,
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-    hour: "2-digit",
-    minute: "2-digit",
-    hourCycle: "h23"
-  });
+  const formatter =
+    new Intl.DateTimeFormat(
+      "en-CA",
+      {
+        timeZone:
+          BUSINESS_TIMEZONE,
+        year:
+          "numeric",
+        month:
+          "2-digit",
+        day:
+          "2-digit",
+        hour:
+          "2-digit",
+        minute:
+          "2-digit",
+        hourCycle:
+          "h23"
+      }
+    );
 
   const result = {};
 
-  formatter.formatToParts(new Date()).forEach(function (part) {
-    if (part.type !== "literal") {
-      result[part.type] = part.value;
-    }
-  });
+  formatter
+    .formatToParts(
+      new Date()
+    )
+    .forEach(
+      function (part) {
+        if (
+          part.type !==
+          "literal"
+        ) {
+          result[
+            part.type
+          ] =
+            part.value;
+        }
+      }
+    );
 
   return {
-    year: Number(result.year),
-    month: Number(result.month),
-    day: Number(result.day),
-    hour: Number(result.hour),
-    minute: Number(result.minute)
+    year:
+      Number(
+        result.year
+      ),
+    month:
+      Number(
+        result.month
+      ),
+    day:
+      Number(
+        result.day
+      ),
+    hour:
+      Number(
+        result.hour
+      ),
+    minute:
+      Number(
+        result.minute
+      )
   };
 }
 
 function padNumber(value) {
-  return String(value).padStart(2, "0");
+  return String(
+    value
+  ).padStart(
+    2,
+    "0"
+  );
 }
 
 function buildDateKey(
@@ -147,9 +574,13 @@ function buildDateKey(
   return (
     yearValue +
     "-" +
-    padNumber(monthValue) +
+    padNumber(
+      monthValue
+    ) +
     "-" +
-    padNumber(dayValue)
+    padNumber(
+      dayValue
+    )
   );
 }
 
@@ -174,7 +605,10 @@ function addDays(
   date,
   amount
 ) {
-  const result = new Date(date.getTime());
+  const result =
+    new Date(
+      date.getTime()
+    );
 
   result.setUTCDate(
     result.getUTCDate() +
@@ -184,7 +618,9 @@ function addDays(
   return result;
 }
 
-function dateToKey(date) {
+function dateToKey(
+  date
+) {
   return buildDateKey(
     date.getUTCFullYear(),
     date.getUTCMonth() + 1,
@@ -192,54 +628,88 @@ function dateToKey(date) {
   );
 }
 
-function formatWeekday(date) {
+function formatWeekday(
+  date
+) {
   return new Intl.DateTimeFormat(
     "pt-BR",
     {
-      weekday: "short",
-      timeZone: "UTC"
+      weekday:
+        "short",
+      timeZone:
+        "UTC"
     }
   )
-    .format(date)
-    .replace(".", "");
+    .format(
+      date
+    )
+    .replace(
+      ".",
+      ""
+    );
 }
 
-function formatMonth(date) {
+function formatMonth(
+  date
+) {
   return new Intl.DateTimeFormat(
     "pt-BR",
     {
-      month: "short",
-      timeZone: "UTC"
+      month:
+        "short",
+      timeZone:
+        "UTC"
     }
   )
-    .format(date)
-    .replace(".", "");
+    .format(
+      date
+    )
+    .replace(
+      ".",
+      ""
+    );
 }
 
-function formatFullDate(date) {
+function formatFullDate(
+  date
+) {
   return new Intl.DateTimeFormat(
     "pt-BR",
     {
-      weekday: "long",
-      day: "2-digit",
-      month: "long",
-      year: "numeric",
-      timeZone: "UTC"
+      weekday:
+        "long",
+      day:
+        "2-digit",
+      month:
+        "long",
+      year:
+        "numeric",
+      timeZone:
+        "UTC"
     }
-  ).format(date);
+  ).format(
+    date
+  );
 }
 
-function capitalizeFirst(value) {
-  if (!value) return "";
+function capitalizeFirst(
+  value
+) {
+  if (!value) {
+    return "";
+  }
 
   return (
-    value.charAt(0).toUpperCase() +
+    value
+      .charAt(0)
+      .toUpperCase() +
     value.slice(1)
   );
 }
 
 function getTodayDate() {
-  const now = getBusinessDateParts();
+  const now =
+    getBusinessDateParts();
 
   return createUtcDate(
     now.year,
@@ -249,7 +719,8 @@ function getTodayDate() {
 }
 
 function getTodayKey() {
-  const now = getBusinessDateParts();
+  const now =
+    getBusinessDateParts();
 
   return buildDateKey(
     now.year,
@@ -259,40 +730,67 @@ function getTodayKey() {
 }
 
 function getCurrentMinutes() {
-  const now = getBusinessDateParts();
+  const now =
+    getBusinessDateParts();
 
   return (
-    now.hour * 60 +
+    now.hour *
+      60 +
     now.minute
   );
 }
 
-function timeToMinutes(time) {
-  if (!time) return 0;
+function timeToMinutes(
+  time
+) {
+  if (!time) {
+    return 0;
+  }
 
-  const parts = String(time).split(":");
+  const parts =
+    String(
+      time
+    ).split(
+      ":"
+    );
 
   return (
-    Number(parts[0]) * 60 +
-    Number(parts[1])
+    Number(
+      parts[0]
+    ) *
+      60 +
+    Number(
+      parts[1]
+    )
   );
 }
 
-function normalizeDatabaseTime(time) {
-  if (!time) return "";
+function normalizeDatabaseTime(
+  time
+) {
+  if (!time) {
+    return "";
+  }
 
-  return String(time).slice(0, 5);
+  return String(
+    time
+  ).slice(
+    0,
+    5
+  );
 }
 
 function generateSlots() {
   const slots = [];
 
   const start =
-    SLOT_START_HOUR * 60 +
+    SLOT_START_HOUR *
+      60 +
     SLOT_START_MINUTE;
 
   const end =
-    SLOT_END_HOUR * 60 +
+    SLOT_END_HOUR *
+      60 +
     SLOT_END_MINUTE;
 
   for (
@@ -301,24 +799,33 @@ function generateSlots() {
     minutes += SLOT_INTERVAL
   ) {
     const hour =
-      Math.floor(minutes / 60);
+      Math.floor(
+        minutes / 60
+      );
 
     const minute =
       minutes % 60;
 
     slots.push({
       value:
-        padNumber(hour) +
+        padNumber(
+          hour
+        ) +
         ":" +
-        padNumber(minute),
-      minutes
+        padNumber(
+          minute
+        ),
+      minutes:
+        minutes
     });
   }
 
   return slots;
 }
 
-function digitsOnly(value) {
+function digitsOnly(
+  value
+) {
   return String(
     value || ""
   ).replace(
@@ -327,10 +834,13 @@ function digitsOnly(value) {
   );
 }
 
-function isValidName(value) {
-  const name = String(
-    value || ""
-  ).trim();
+function isValidName(
+  value
+) {
+  const name =
+    String(
+      value || ""
+    ).trim();
 
   return (
     name.length >= 2 &&
@@ -338,8 +848,13 @@ function isValidName(value) {
   );
 }
 
-function isValidPhone(value) {
-  const digits = digitsOnly(value);
+function isValidPhone(
+  value
+) {
+  const digits =
+    digitsOnly(
+      value
+    );
 
   return (
     digits.length >= 10 &&
@@ -347,42 +862,75 @@ function isValidPhone(value) {
   );
 }
 
-function formatPhoneInput(value) {
+function formatPhoneInput(
+  value
+) {
   const digits =
-    digitsOnly(value)
-      .slice(0, 11);
+    digitsOnly(
+      value
+    ).slice(
+      0,
+      11
+    );
 
-  if (digits.length <= 2) {
+  if (
+    digits.length <= 2
+  ) {
     return digits;
   }
 
-  if (digits.length <= 6) {
+  if (
+    digits.length <= 6
+  ) {
     return (
       "(" +
-      digits.slice(0, 2) +
+      digits.slice(
+        0,
+        2
+      ) +
       ") " +
-      digits.slice(2)
+      digits.slice(
+        2
+      )
     );
   }
 
-  if (digits.length <= 10) {
+  if (
+    digits.length <= 10
+  ) {
     return (
       "(" +
-      digits.slice(0, 2) +
+      digits.slice(
+        0,
+        2
+      ) +
       ") " +
-      digits.slice(2, 6) +
+      digits.slice(
+        2,
+        6
+      ) +
       "-" +
-      digits.slice(6)
+      digits.slice(
+        6
+      )
     );
   }
 
   return (
     "(" +
-    digits.slice(0, 2) +
+    digits.slice(
+      0,
+      2
+    ) +
     ") " +
-    digits.slice(2, 7) +
+    digits.slice(
+      2,
+      7
+    ) +
     "-" +
-    digits.slice(7)
+    digits.slice(
+      7
+    )
   );
 }
 
@@ -390,29 +938,33 @@ async function supabaseRpc(
   functionName,
   payload = {}
 ) {
-  const response = await fetch(
-    SUPABASE_URL +
-    "/rest/v1/rpc/" +
-    functionName,
-    {
-      method: "POST",
+  const response =
+    await fetch(
+      SUPABASE_URL +
+      "/rest/v1/rpc/" +
+      functionName,
+      {
+        method:
+          "POST",
 
-      headers: {
-        "Content-Type":
-          "application/json",
+        headers: {
+          "Content-Type":
+            "application/json",
 
-        apikey:
-          SUPABASE_PUBLISHABLE_KEY,
+          apikey:
+            SUPABASE_PUBLISHABLE_KEY,
 
-        Authorization:
-          "Bearer " +
-          SUPABASE_PUBLISHABLE_KEY
-      },
+          Authorization:
+            "Bearer " +
+            SUPABASE_PUBLISHABLE_KEY
+        },
 
-      body:
-        JSON.stringify(payload)
-    }
-  );
+        body:
+          JSON.stringify(
+            payload
+          )
+      }
+    );
 
   const contentType =
     response.headers.get(
@@ -434,20 +986,25 @@ async function supabaseRpc(
       await response.text();
   }
 
-  if (!response.ok) {
+  if (
+    !response.ok
+  ) {
     let message =
       "Não foi possível concluir a operação.";
 
     if (
       data &&
-      typeof data === "object" &&
+      typeof data ===
+        "object" &&
       data.message
     ) {
       message =
         data.message;
     }
 
-    throw new Error(message);
+    throw new Error(
+      message
+    );
   }
 
   return data;
@@ -560,7 +1117,9 @@ function injectBookingStyles() {
     }
   `;
 
-  document.head.appendChild(style);
+  document.head.appendChild(
+    style
+  );
 }
 
 function createBarberStep() {
@@ -656,18 +1215,24 @@ function createBarberStep() {
       ".booking-step-number"
     );
 
-  if (dayNumber) {
+  if (
+    dayNumber
+  ) {
     dayNumber.textContent =
       "03";
   }
 
-  if (timeStep) {
+  if (
+    timeStep
+  ) {
     const timeNumber =
       timeStep.querySelector(
         ".booking-step-number"
       );
 
-    if (timeNumber) {
+    if (
+      timeNumber
+    ) {
       timeNumber.textContent =
         "04";
     }
@@ -798,7 +1363,9 @@ function createCustomerStep(
           this.value
         );
 
-      if (caretAtEnd) {
+      if (
+        caretAtEnd
+      ) {
         this.setSelectionRange(
           this.value.length,
           this.value.length
@@ -816,14 +1383,20 @@ function createBarberSummary() {
       "summary-barber"
     );
 
-  if (existing) {
+  if (
+    existing
+  ) {
     summaryBarber =
       existing;
 
     return;
   }
 
-  if (!summaryDate) return;
+  if (
+    !summaryDate
+  ) {
+    return;
+  }
 
   const dateRow =
     summaryDate.parentElement;
@@ -867,7 +1440,9 @@ function createCustomerSummary() {
       "summary-customer"
     );
 
-  if (existing) {
+  if (
+    existing
+  ) {
     summaryCustomer =
       existing;
 
@@ -877,7 +1452,9 @@ function createCustomerSummary() {
   if (
     !summaryService ||
     !summaryService.parentElement ||
-    !summaryService.parentElement.parentElement
+    !summaryService
+      .parentElement
+      .parentElement
   ) {
     return;
   }
@@ -897,10 +1474,13 @@ function createCustomerSummary() {
     </strong>
   `;
 
-  summaryService.parentElement.parentElement.insertBefore(
-    customerRow,
-    summaryService.parentElement
-  );
+  summaryService
+    .parentElement
+    .parentElement
+    .insertBefore(
+      customerRow,
+      summaryService.parentElement
+    );
 
   summaryCustomer =
     document.getElementById(
@@ -909,7 +1489,11 @@ function createCustomerSummary() {
 }
 
 async function loadBarbers() {
-  if (!bookingBarber) return;
+  if (
+    !bookingBarber
+  ) {
+    return;
+  }
 
   try {
     const data =
@@ -918,7 +1502,9 @@ async function loadBarbers() {
       );
 
     barbers =
-      Array.isArray(data)
+      Array.isArray(
+        data
+      )
         ? data
         : [];
 
@@ -968,6 +1554,7 @@ async function loadBarbers() {
       bookingBarber.disabled =
         true;
     }
+
   } catch (error) {
     console.error(
       "Erro ao carregar barbeiros:",
@@ -985,7 +1572,9 @@ async function loadBarbers() {
 }
 
 function getSelectedBarber() {
-  if (!selectedBarberId) {
+  if (
+    !selectedBarberId
+  ) {
     return null;
   }
 
@@ -1002,7 +1591,9 @@ function getSelectedBarber() {
 }
 
 function updateBarberSummary() {
-  if (summaryBarber) {
+  if (
+    summaryBarber
+  ) {
     summaryBarber.textContent =
       selectedBarberName ||
       "Não selecionado";
@@ -1010,11 +1601,17 @@ function updateBarberSummary() {
 }
 
 function updateCustomerSummary() {
-  if (!summaryCustomer) return;
+  if (
+    !summaryCustomer
+  ) {
+    return;
+  }
 
   const name =
     bookingCustomerName
-      ? bookingCustomerName.value.trim()
+      ? bookingCustomerName
+          .value
+          .trim()
       : "";
 
   summaryCustomer.textContent =
@@ -1032,7 +1629,9 @@ function addBlockedSlot(
   time
 ) {
   if (
-    !blockedSlots.has(date)
+    !blockedSlots.has(
+      date
+    )
   ) {
     blockedSlots.set(
       date,
@@ -1041,8 +1640,12 @@ function addBlockedSlot(
   }
 
   blockedSlots
-    .get(date)
-    .add(time);
+    .get(
+      date
+    )
+    .add(
+      time
+    );
 }
 
 function isSlotBlocked(
@@ -1050,10 +1653,16 @@ function isSlotBlocked(
   time
 ) {
   return (
-    blockedSlots.has(date) &&
+    blockedSlots.has(
+      date
+    ) &&
     blockedSlots
-      .get(date)
-      .has(time)
+      .get(
+        date
+      )
+      .has(
+        time
+      )
   );
 }
 
@@ -1069,40 +1678,46 @@ function hasAvailableTime(
   }
 
   return generateSlots()
-    .some(function (slot) {
-      if (
-        isSlotBlocked(
-          dateKey,
-          slot.value
-        )
-      ) {
-        return false;
-      }
+    .some(
+      function (slot) {
+        if (
+          isSlotBlocked(
+            dateKey,
+            slot.value
+          )
+        ) {
+          return false;
+        }
 
-      if (
-        dateKey ===
-          getTodayKey() &&
-        slot.minutes <=
-          getCurrentMinutes()
-      ) {
-        return false;
-      }
+        if (
+          dateKey ===
+            getTodayKey() &&
+          slot.minutes <=
+            getCurrentMinutes()
+        ) {
+          return false;
+        }
 
-      return true;
-    });
+        return true;
+      }
+    );
 }
 
 function showSelectionRequiredState(
   message
 ) {
-  if (bookingDays) {
+  if (
+    bookingDays
+  ) {
     bookingDays.innerHTML =
       '<div class="booking-empty">' +
       message +
       "</div>";
   }
 
-  if (bookingTimes) {
+  if (
+    bookingTimes
+  ) {
     bookingTimes.innerHTML =
       '<div class="booking-empty">' +
       message +
@@ -1126,7 +1741,9 @@ async function loadBookedSlots() {
     return;
   }
 
-  if (!selectedBarberId) {
+  if (
+    !selectedBarberId
+  ) {
     clearBlockedSlots();
 
     showSelectionRequiredState(
@@ -1159,17 +1776,23 @@ async function loadBookedSlots() {
             bookingService.value,
 
           p_start_date:
-            dateToKey(today),
+            dateToKey(
+              today
+            ),
 
           p_end_date:
-            dateToKey(finalDate)
+            dateToKey(
+              finalDate
+            )
         }
       );
 
     clearBlockedSlots();
 
     if (
-      Array.isArray(data)
+      Array.isArray(
+        data
+      )
     ) {
       data.forEach(
         function (item) {
@@ -1222,7 +1845,11 @@ async function loadBookedSlots() {
 }
 
 function updateServiceSummary() {
-  if (!bookingService) return;
+  if (
+    !bookingService
+  ) {
+    return;
+  }
 
   const option =
     bookingService.options[
@@ -1234,16 +1861,21 @@ function updateServiceSummary() {
 
   const price =
     option
-      ? option.dataset.price || ""
+      ? option.dataset.price ||
+        ""
       : "";
 
-  if (summaryService) {
+  if (
+    summaryService
+  ) {
     summaryService.textContent =
       service ||
       "Não selecionado";
   }
 
-  if (summaryPrice) {
+  if (
+    summaryPrice
+  ) {
     summaryPrice.textContent =
       price ||
       "—";
@@ -1252,19 +1884,29 @@ function updateServiceSummary() {
   updateSubmitState();
 }
 
-function updateDateSummary(date) {
-  if (!summaryDate) return;
+function updateDateSummary(
+  date
+) {
+  if (
+    !summaryDate
+  ) {
+    return;
+  }
 
   summaryDate.textContent =
     date
       ? capitalizeFirst(
-          formatFullDate(date)
+          formatFullDate(
+            date
+          )
         )
       : "Não selecionado";
 }
 
 function updateTimeSummary() {
-  if (summaryTime) {
+  if (
+    summaryTime
+  ) {
     summaryTime.textContent =
       selectedTime ||
       "Não selecionado";
@@ -1321,7 +1963,11 @@ function updateSubmitState() {
 }
 
 function renderDays() {
-  if (!bookingDays) return;
+  if (
+    !bookingDays
+  ) {
+    return;
+  }
 
   if (
     !bookingService ||
@@ -1334,7 +1980,9 @@ function renderDays() {
     return;
   }
 
-  if (!selectedBarberId) {
+  if (
+    !selectedBarberId
+  ) {
     showSelectionRequiredState(
       "Escolha um barbeiro para visualizar a disponibilidade."
     );
@@ -1349,7 +1997,9 @@ function renderDays() {
     getTodayDate();
 
   const todayKey =
-    dateToKey(today);
+    dateToKey(
+      today
+    );
 
   let firstAvailableDate =
     null;
@@ -1367,7 +2017,9 @@ function renderDays() {
       );
 
     const dateKey =
-      dateToKey(date);
+      dateToKey(
+        date
+      );
 
     const button =
       document.createElement(
@@ -1385,7 +2037,9 @@ function renderDays() {
 
     button.innerHTML =
       "<span>" +
-      formatWeekday(date) +
+      formatWeekday(
+        date
+      ) +
       "</span>" +
       "<strong>" +
       padNumber(
@@ -1393,7 +2047,9 @@ function renderDays() {
       ) +
       "</strong>" +
       "<small>" +
-      formatMonth(date) +
+      formatMonth(
+        date
+      ) +
       "</small>";
 
     if (
@@ -1410,7 +2066,9 @@ function renderDays() {
         dateKey
       );
 
-    if (!available) {
+    if (
+      !available
+    ) {
       button.disabled =
         true;
 
@@ -1460,7 +2118,9 @@ function renderDays() {
     return;
   }
 
-  if (firstAvailableDate) {
+  if (
+    firstAvailableDate
+  ) {
     selectDate(
       firstAvailableDate
     );
@@ -1486,7 +2146,9 @@ function renderDays() {
     "</div>";
 }
 
-function selectDate(date) {
+function selectDate(
+  date
+) {
   selectedDate =
     new Date(
       date.getTime()
@@ -1536,7 +2198,11 @@ function selectDate(date) {
 }
 
 function renderTimes() {
-  if (!bookingTimes) return;
+  if (
+    !bookingTimes
+  ) {
+    return;
+  }
 
   if (
     !bookingService ||
@@ -1550,7 +2216,9 @@ function renderTimes() {
     return;
   }
 
-  if (!selectedBarberId) {
+  if (
+    !selectedBarberId
+  ) {
     bookingTimes.innerHTML =
       '<div class="booking-empty">' +
       "Escolha um barbeiro primeiro." +
@@ -1559,7 +2227,9 @@ function renderTimes() {
     return;
   }
 
-  if (!selectedDate) {
+  if (
+    !selectedDate
+  ) {
     bookingTimes.innerHTML =
       '<div class="booking-empty">' +
       "Escolha um dia para visualizar os horários." +
@@ -1610,7 +2280,9 @@ function renderTimes() {
           slot.value
         );
 
-      if (occupied) {
+      if (
+        occupied
+      ) {
         button.innerHTML =
           '<span class="booking-time-value">' +
           slot.value +
@@ -1635,7 +2307,9 @@ function renderTimes() {
           slot.value +
           " — horário ocupado";
 
-      } else if (passed) {
+      } else if (
+        passed
+      ) {
         button.textContent =
           slot.value;
 
@@ -1732,7 +2406,8 @@ function selectTime(
   ).forEach(
     function (item) {
       const active =
-        item === button;
+        item ===
+        button;
 
       item.classList.toggle(
         "is-selected",
@@ -1754,7 +2429,11 @@ function selectTime(
 }
 
 async function handleBarberChange() {
-  if (!bookingBarber) return;
+  if (
+    !bookingBarber
+  ) {
+    return;
+  }
 
   selectedBarberId =
     bookingBarber.value ||
@@ -1796,7 +2475,9 @@ async function handleBarberChange() {
     return;
   }
 
-  if (!selectedBarberId) {
+  if (
+    !selectedBarberId
+  ) {
     showSelectionRequiredState(
       "Escolha um barbeiro para visualizar a disponibilidade."
     );
@@ -1848,7 +2529,9 @@ async function handleServiceChange() {
     return;
   }
 
-  if (!selectedBarberId) {
+  if (
+    !selectedBarberId
+  ) {
     showSelectionRequiredState(
       "Escolha um barbeiro para visualizar a disponibilidade."
     );
@@ -1876,7 +2559,9 @@ async function handleServiceChange() {
 function findServiceOption(
   service
 ) {
-  if (!bookingService) {
+  if (
+    !bookingService
+  ) {
     return null;
   }
 
@@ -1902,7 +2587,11 @@ function selectServiceFromLink(
       service
     );
 
-  if (!option) return;
+  if (
+    !option
+  ) {
+    return;
+  }
 
   bookingService.value =
     service;
@@ -1919,7 +2608,9 @@ function setupServiceLinks() {
           const service =
             link.dataset.serviceLink;
 
-          if (service) {
+          if (
+            service
+          ) {
             selectServiceFromLink(
               service
             );
@@ -1997,7 +2688,9 @@ function prepareWhatsappWindow() {
       "_blank"
     );
 
-  if (newWindow) {
+  if (
+    newWindow
+  ) {
     try {
       newWindow.document.title =
         "Abrindo WhatsApp...";
@@ -2009,7 +2702,9 @@ function prepareWhatsappWindow() {
         "</div>";
 
     } catch (error) {
-      console.error(error);
+      console.error(
+        error
+      );
     }
   }
 
@@ -2020,16 +2715,24 @@ function sendWhatsappToWindow(
   preparedWindow,
   whatsappUrl
 ) {
-  if (!whatsappUrl) return;
+  if (
+    !whatsappUrl
+  ) {
+    return;
+  }
 
-  if (preparedWindow) {
+  if (
+    preparedWindow
+  ) {
     preparedWindow.location.href =
       whatsappUrl;
 
     try {
       preparedWindow.focus();
     } catch (error) {
-      console.error(error);
+      console.error(
+        error
+      );
     }
 
     return;
@@ -2113,7 +2816,9 @@ async function submitBooking() {
   const whatsappMessage =
     buildWhatsappMessage();
 
-  if (!whatsappMessage) {
+  if (
+    !whatsappMessage
+  ) {
     alert(
       "Não foi possível montar a mensagem do WhatsApp. Revise os dados e tente novamente."
     );
@@ -2137,7 +2842,9 @@ async function submitBooking() {
       ? bookingSubmit.textContent
       : "";
 
-  if (bookingSubmit) {
+  if (
+    bookingSubmit
+  ) {
     bookingSubmit.disabled =
       true;
 
@@ -2221,7 +2928,9 @@ async function submitBooking() {
     bookingRequestInProgress =
       false;
 
-    if (bookingSubmit) {
+    if (
+      bookingSubmit
+    ) {
       bookingSubmit.textContent =
         originalText ||
         "Confirmar pelo WhatsApp";
@@ -2249,14 +2958,18 @@ async function setupBooking() {
     handleServiceChange
   );
 
-  if (bookingBarber) {
+  if (
+    bookingBarber
+  ) {
     bookingBarber.addEventListener(
       "change",
       handleBarberChange
     );
   }
 
-  if (bookingSubmit) {
+  if (
+    bookingSubmit
+  ) {
     bookingSubmit.addEventListener(
       "click",
       submitBooking
@@ -2313,7 +3026,9 @@ function setupInternalLinks() {
               href
             );
 
-          if (!target) {
+          if (
+            !target
+          ) {
             return;
           }
 
@@ -2388,7 +3103,11 @@ async function refreshAvailability() {
 }
 
 function initializeSite() {
+  setupDeviceDetection();
+
   setupMenu();
+
+  setupMobileServices();
 
   setupInternalLinks();
 
@@ -2402,6 +3121,11 @@ function initializeSite() {
   window.setInterval(
     refreshAvailability,
     30000
+  );
+
+  window.addEventListener(
+    "resize",
+    setupDeviceDetection
   );
 }
 
