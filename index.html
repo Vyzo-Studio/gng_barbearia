@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
   <meta charset="UTF-8">
 
@@ -32,6 +33,12 @@
   >
 
   <link
+    rel="preload"
+    as="image"
+    href="assets/gng-corte-01.png"
+  >
+
+  <link
     rel="preconnect"
     href="https://fonts.googleapis.com"
   >
@@ -49,7 +56,7 @@
 
   <link
     rel="stylesheet"
-    href="style.css?v=8.0"
+    href="style.css?v=8.1"
   >
 </head>
 
@@ -78,6 +85,7 @@
         <img
           src="assets/logo-gng.jpg"
           alt="GNG Barbearia"
+          decoding="async"
         >
 
       </a>
@@ -152,7 +160,9 @@
 
           <h1>
             PRESENÇA
-            <span>COMEÇA NO CUIDADO.</span>
+            <span>
+              COMEÇA NO CUIDADO.
+            </span>
           </h1>
 
           <p class="hero-lead">
@@ -231,6 +241,8 @@
             <img
               src="assets/gng-corte-01.png"
               alt="Barbeiro atendendo cliente"
+              fetchpriority="high"
+              decoding="async"
             >
 
           </figure>
@@ -240,6 +252,7 @@
             <img
               src="assets/gng-corte-02.png"
               alt="Exemplo de barba alinhada"
+              decoding="async"
             >
 
           </figure>
@@ -249,6 +262,7 @@
             <img
               src="assets/logo-gng.jpg"
               alt=""
+              decoding="async"
             >
 
             <p>
@@ -281,7 +295,7 @@
         <div>
           <span>02</span>
           <strong>Agendamento online</strong>
-          <small>Escolha dia e horário</small>
+          <small>Serviço, barbeiro, dia e horário</small>
         </div>
 
         <div>
@@ -322,8 +336,8 @@
           </div>
 
           <p>
-            Serviços organizados de forma simples e com
-            contraste forte para facilitar a leitura.
+            Escolha o serviço que deseja e siga direto
+            para o agendamento.
           </p>
 
         </div>
@@ -349,9 +363,11 @@
                 </th>
 
                 <th>
+
                   <span class="sr-only">
                     Ação
                   </span>
+
                 </th>
 
               </tr>
@@ -371,9 +387,7 @@
                 </td>
 
                 <td data-label="Valor">
-                  <strong>
-                    R$ 25,00
-                  </strong>
+                  <strong>R$ 25,00</strong>
                 </td>
 
                 <td class="table-action">
@@ -400,9 +414,7 @@
                 </td>
 
                 <td data-label="Valor">
-                  <strong>
-                    R$ 30,00
-                  </strong>
+                  <strong>R$ 30,00</strong>
                 </td>
 
                 <td class="table-action">
@@ -429,9 +441,7 @@
                 </td>
 
                 <td data-label="Valor">
-                  <strong>
-                    R$ 55,00
-                  </strong>
+                  <strong>R$ 55,00</strong>
                 </td>
 
                 <td class="table-action">
@@ -458,9 +468,7 @@
                 </td>
 
                 <td data-label="Valor">
-                  <strong>
-                    R$ 50,00
-                  </strong>
+                  <strong>R$ 50,00</strong>
                 </td>
 
                 <td class="table-action">
@@ -487,9 +495,7 @@
                 </td>
 
                 <td data-label="Valor">
-                  <strong>
-                    R$ 45,00
-                  </strong>
+                  <strong>R$ 45,00</strong>
                 </td>
 
                 <td class="table-action">
@@ -516,9 +522,7 @@
                 </td>
 
                 <td data-label="Valor">
-                  <strong>
-                    R$ 40,00
-                  </strong>
+                  <strong>R$ 40,00</strong>
                 </td>
 
                 <td class="table-action">
@@ -545,9 +549,7 @@
                 </td>
 
                 <td data-label="Valor">
-                  <strong>
-                    R$ 65,00
-                  </strong>
+                  <strong>R$ 65,00</strong>
                 </td>
 
                 <td class="table-action">
@@ -574,9 +576,7 @@
                 </td>
 
                 <td data-label="Valor">
-                  <strong>
-                    R$ 110,00
-                  </strong>
+                  <strong>R$ 110,00</strong>
                 </td>
 
                 <td class="table-action">
@@ -603,9 +603,7 @@
                 </td>
 
                 <td data-label="Valor">
-                  <strong>
-                    R$ 40,00
-                  </strong>
+                  <strong>R$ 40,00</strong>
                 </td>
 
                 <td class="table-action">
@@ -632,9 +630,7 @@
                 </td>
 
                 <td data-label="Valor">
-                  <strong>
-                    R$ 45,00
-                  </strong>
+                  <strong>R$ 45,00</strong>
                 </td>
 
                 <td class="table-action">
@@ -661,9 +657,7 @@
                 </td>
 
                 <td data-label="Valor">
-                  <strong>
-                    R$ 85,00
-                  </strong>
+                  <strong>R$ 85,00</strong>
                 </td>
 
                 <td class="table-action">
@@ -690,9 +684,7 @@
                 </td>
 
                 <td data-label="Valor">
-                  <strong>
-                    R$ 20,00
-                  </strong>
+                  <strong>R$ 20,00</strong>
                 </td>
 
                 <td class="table-action">
@@ -719,9 +711,7 @@
                 </td>
 
                 <td data-label="Valor">
-                  <strong>
-                    R$ 50,00
-                  </strong>
+                  <strong>R$ 50,00</strong>
                 </td>
 
                 <td class="table-action">
@@ -769,7 +759,7 @@
           </div>
 
           <p>
-            Selecione o serviço, escolha o dia e depois
+            Escolha o serviço, o barbeiro, o dia e
             um horário disponível entre 09:00 e 19:30.
           </p>
 
@@ -938,6 +928,7 @@
                 class="booking-days"
                 id="booking-days"
                 aria-label="Escolha o dia do atendimento"
+                aria-live="polite"
               ></div>
 
             </div>
@@ -968,6 +959,7 @@
                 class="booking-times"
                 id="booking-times"
                 aria-label="Escolha o horário do atendimento"
+                aria-live="polite"
               >
 
                 <div class="booking-empty">
@@ -980,7 +972,10 @@
 
           </div>
 
-          <aside class="booking-summary">
+          <aside
+            class="booking-summary"
+            aria-label="Resumo do agendamento"
+          >
 
             <div class="booking-summary-top">
 
@@ -994,7 +989,10 @@
 
             </div>
 
-            <div class="booking-summary-list">
+            <div
+              class="booking-summary-list"
+              aria-live="polite"
+            >
 
               <div>
 
@@ -1098,8 +1096,8 @@
           </div>
 
           <p>
-            Exemplos reais já disponíveis para apresentar
-            corte, acabamento e cuidado masculino.
+            Exemplos reais de corte, acabamento
+            e cuidado masculino.
           </p>
 
         </div>
@@ -1111,6 +1109,8 @@
             <img
               src="assets/gng-corte-01.png"
               alt="Exemplo de corte masculino"
+              loading="lazy"
+              decoding="async"
             >
 
             <figcaption>
@@ -1132,6 +1132,8 @@
             <img
               src="assets/gng-corte-02.png"
               alt="Exemplo de barba masculina"
+              loading="lazy"
+              decoding="async"
             >
 
             <figcaption>
@@ -1208,6 +1210,7 @@
               src="https://images.unsplash.com/photo-1702865272115-5afdbae975af?auto=format&fit=crop&w=1600&q=82"
               alt="Imagem ilustrativa de interior de barbearia"
               loading="lazy"
+              decoding="async"
             >
 
             <figcaption>
@@ -1234,6 +1237,7 @@
               src="https://images.unsplash.com/photo-1779703056737-7f327f484fda?auto=format&fit=crop&w=1600&q=82"
               alt="Imagem ilustrativa de fachada de barbearia"
               loading="lazy"
+              decoding="async"
             >
 
             <figcaption>
@@ -1550,6 +1554,8 @@
             <img
               src="assets/logo-gng.jpg"
               alt=""
+              loading="lazy"
+              decoding="async"
             >
 
             <div>
@@ -1596,7 +1602,8 @@
           </h2>
 
           <p>
-            Escolha o serviço, o dia e o horário no próprio site.
+            Escolha o serviço, barbeiro, dia e horário
+            no próprio site.
           </p>
 
         </div>
@@ -1622,6 +1629,8 @@
         class="footer-logo"
         src="assets/logo-gng.jpg"
         alt="GNG Barbearia"
+        loading="lazy"
+        decoding="async"
       >
 
       <div class="footer-links">
@@ -1672,15 +1681,8 @@
 
   </footer>
 
-  <div class="mobile-booking">
-
-    <a href="#agendamento">
-      Agendar horário
-    </a>
-
-  </div>
-
-  <script src="script.js?v=10.0"></script>
+  <script src="script.js?v=11.0"></script>
 
 </body>
+
 </html>
