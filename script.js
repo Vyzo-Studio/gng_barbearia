@@ -81,15 +81,18 @@ function setupDeviceDetection() {
     touchPoints > 1;
 
   const isIOS =
-    /iPhone|iPad|iPod/i.test(
-      userAgent
-    ) ||
+    /iPhone|iPad|iPod/i.test(userAgent) ||
     isIPadDesktopMode;
 
   const isAndroid =
-    /Android/i.test(
-      userAgent
-    );
+    /Android/i.test(userAgent);
+
+  const isMacOS =
+    !isIOS &&
+    /Macintosh|Mac OS X/i.test(userAgent);
+
+  const isWindows =
+    /Windows/i.test(userAgent);
 
   const isMobileViewport =
     window.matchMedia(
@@ -103,48 +106,181 @@ function setupDeviceDetection() {
     "device-ios",
     "device-android",
     "device-mobile",
+    "device-macos",
+    "device-windows",
     "device-desktop"
   );
 
+  let device =
+    "desktop";
+
   if (isIOS) {
-    root.classList.add(
-      "device-ios"
-    );
-
-    root.dataset.device =
+    device =
       "ios";
-
-    return;
-  }
-
-  if (isAndroid) {
-    root.classList.add(
-      "device-android"
-    );
-
-    root.dataset.device =
+  } else if (isAndroid) {
+    device =
       "android";
-
-    return;
-  }
-
-  if (isMobileViewport) {
-    root.classList.add(
-      "device-mobile"
-    );
-
-    root.dataset.device =
+  } else if (isMacOS) {
+    device =
+      "macos";
+  } else if (isWindows) {
+    device =
+      "windows";
+  } else if (isMobileViewport) {
+    device =
       "mobile";
-
-    return;
   }
 
   root.classList.add(
-    "device-desktop"
+    "device-" + device
   );
 
   root.dataset.device =
-    "desktop";
+    device;
+
+  return device;
+}
+
+function getDeviceType() {
+  return (
+    document.documentElement.dataset.device ||
+    setupDeviceDetection()
+  );
+}
+
+function isMobileDevice() {
+  const device =
+    getDeviceType();
+
+  return (
+    device === "ios" ||
+    device === "android" ||
+    device === "mobile"
+  );
+}
+
+function buildWhatsappUrl(
+  number,
+  message
+) {
+  const cleanNumber =
+    digitsOnly(number);
+
+  const encodedMessage =
+    encodeURIComponent(
+      message || ""
+    );
+
+  if (isMobileDevice()) {
+    return (
+      "https://wa.me/" +
+      cleanNumber +
+      "?text=" +
+      encodedMessage
+    );
+  }
+
+  return (
+    "https://web.whatsapp.com/send?phone=" +
+    cleanNumber +
+    "&text=" +
+    encodedMessage
+  );
+}
+
+function readWhatsappLink(link) {
+  const href =
+    link.getAttribute("href");
+
+  if (!href) {
+    return null;
+  }
+
+  try {
+    const url =
+      new URL(
+        href,
+        window.location.href
+      );
+
+    let number = "";
+
+    if (
+      url.hostname === "wa.me" ||
+      url.hostname.endsWith(".wa.me")
+    ) {
+      number =
+        url.pathname.replace(
+          /\D/g,
+          ""
+        );
+    }
+
+    if (
+      url.hostname.includes(
+        "web.whatsapp.com"
+      ) ||
+      url.hostname.includes(
+        "api.whatsapp.com"
+      )
+    ) {
+      number =
+        digitsOnly(
+          url.searchParams.get(
+            "phone"
+          )
+        );
+    }
+
+    if (!number) {
+      return null;
+    }
+
+    return {
+      number,
+      message:
+        url.searchParams.get(
+          "text"
+        ) || ""
+    };
+
+  } catch (error) {
+    return null;
+  }
+}
+
+function setupDeviceAwareWhatsappLinks() {
+  const links =
+    Array.from(
+      document.querySelectorAll(
+        'a[href*="wa.me"], a[href*="whatsapp.com"]'
+      )
+    );
+
+  links.forEach(
+    function (link) {
+      const data =
+        readWhatsappLink(
+          link
+        );
+
+      if (!data) {
+        return;
+      }
+
+      link.href =
+        buildWhatsappUrl(
+          data.number,
+          data.message
+        );
+
+      link.target =
+        "_blank";
+
+      link.rel =
+        "noopener noreferrer";
+    }
+  );
 }
 
 function closeMenu() {
@@ -498,16 +634,22 @@ function getBusinessDateParts() {
       {
         timeZone:
           BUSINESS_TIMEZONE,
+
         year:
           "numeric",
+
         month:
           "2-digit",
+
         day:
           "2-digit",
+
         hour:
           "2-digit",
+
         minute:
           "2-digit",
+
         hourCycle:
           "h23"
       }
@@ -538,18 +680,22 @@ function getBusinessDateParts() {
       Number(
         result.year
       ),
+
     month:
       Number(
         result.month
       ),
+
     day:
       Number(
         result.day
       ),
+
     hour:
       Number(
         result.hour
       ),
+
     minute:
       Number(
         result.minute
@@ -618,9 +764,7 @@ function addDays(
   return result;
 }
 
-function dateToKey(
-  date
-) {
+function dateToKey(date) {
   return buildDateKey(
     date.getUTCFullYear(),
     date.getUTCMonth() + 1,
@@ -628,14 +772,13 @@ function dateToKey(
   );
 }
 
-function formatWeekday(
-  date
-) {
+function formatWeekday(date) {
   return new Intl.DateTimeFormat(
     "pt-BR",
     {
       weekday:
         "short",
+
       timeZone:
         "UTC"
     }
@@ -649,14 +792,13 @@ function formatWeekday(
     );
 }
 
-function formatMonth(
-  date
-) {
+function formatMonth(date) {
   return new Intl.DateTimeFormat(
     "pt-BR",
     {
       month:
         "short",
+
       timeZone:
         "UTC"
     }
@@ -670,20 +812,22 @@ function formatMonth(
     );
 }
 
-function formatFullDate(
-  date
-) {
+function formatFullDate(date) {
   return new Intl.DateTimeFormat(
     "pt-BR",
     {
       weekday:
         "long",
+
       day:
         "2-digit",
+
       month:
         "long",
+
       year:
         "numeric",
+
       timeZone:
         "UTC"
     }
@@ -740,9 +884,7 @@ function getCurrentMinutes() {
   );
 }
 
-function timeToMinutes(
-  time
-) {
+function timeToMinutes(time) {
   if (!time) {
     return 0;
   }
@@ -815,17 +957,15 @@ function generateSlots() {
         padNumber(
           minute
         ),
-      minutes:
-        minutes
+
+      minutes
     });
   }
 
   return slots;
 }
 
-function digitsOnly(
-  value
-) {
+function digitsOnly(value) {
   return String(
     value || ""
   ).replace(
@@ -834,9 +974,7 @@ function digitsOnly(
   );
 }
 
-function isValidName(
-  value
-) {
+function isValidName(value) {
   const name =
     String(
       value || ""
@@ -848,9 +986,7 @@ function isValidName(
   );
 }
 
-function isValidPhone(
-  value
-) {
+function isValidPhone(value) {
   const digits =
     digitsOnly(
       value
@@ -862,9 +998,7 @@ function isValidPhone(
   );
 }
 
-function formatPhoneInput(
-  value
-) {
+function formatPhoneInput(value) {
   const digits =
     digitsOnly(
       value
@@ -1243,7 +1377,6 @@ function createBarberStep() {
   );
 
   createBarberSummary();
-
   createCustomerSummary();
 }
 
@@ -2146,9 +2279,7 @@ function renderDays() {
     "</div>";
 }
 
-function selectDate(
-  date
-) {
+function selectDate(date) {
   selectedDate =
     new Date(
       date.getTime()
@@ -2406,8 +2537,7 @@ function selectTime(
   ).forEach(
     function (item) {
       const active =
-        item ===
-        button;
+        item === button;
 
       item.classList.toggle(
         "is-selected",
@@ -2424,7 +2554,6 @@ function selectTime(
   );
 
   updateTimeSummary();
-
   updateSubmitState();
 }
 
@@ -2671,13 +2800,9 @@ function buildWhatsappMessage() {
 function buildWhatsappUrlFromMessage(
   message
 ) {
-  return (
-    "https://wa.me/" +
-    WHATSAPP_NUMBER +
-    "?text=" +
-    encodeURIComponent(
-      message
-    )
+  return buildWhatsappUrl(
+    WHATSAPP_NUMBER,
+    message
   );
 }
 
@@ -2692,13 +2817,29 @@ function prepareWhatsappWindow() {
     newWindow
   ) {
     try {
+      const mobile =
+        isMobileDevice();
+
       newWindow.document.title =
-        "Abrindo WhatsApp...";
+        mobile
+          ? "Abrindo WhatsApp..."
+          : "Abrindo WhatsApp Web...";
 
       newWindow.document.body.innerHTML =
-        '<div style="font-family:Arial,sans-serif;padding:40px;text-align:center;color:#17243a">' +
+        '<div style="' +
+        "font-family:Arial,sans-serif;" +
+        "padding:40px;" +
+        "text-align:center;" +
+        "color:#17243a" +
+        '">' +
         "<strong>Aguarde...</strong>" +
-        "<p>Estamos registrando sua solicitação e abrindo o WhatsApp.</p>" +
+        "<p>" +
+        (
+          mobile
+            ? "Estamos registrando sua solicitação e abrindo o WhatsApp."
+            : "Estamos registrando sua solicitação e abrindo o WhatsApp Web."
+        ) +
+        "</p>" +
         "</div>";
 
     } catch (error) {
@@ -2979,9 +3120,7 @@ async function setupBooking() {
   setupServiceLinks();
 
   updateServiceSummary();
-
   updateBarberSummary();
-
   updateCustomerSummary();
 
   updateDateSummary(
@@ -3102,6 +3241,11 @@ async function refreshAvailability() {
   renderDays();
 }
 
+function refreshDeviceSettings() {
+  setupDeviceDetection();
+  setupDeviceAwareWhatsappLinks();
+}
+
 function initializeSite() {
   setupDeviceDetection();
 
@@ -3110,6 +3254,8 @@ function initializeSite() {
   setupMobileServices();
 
   setupInternalLinks();
+
+  setupDeviceAwareWhatsappLinks();
 
   setupBooking();
 
@@ -3125,7 +3271,7 @@ function initializeSite() {
 
   window.addEventListener(
     "resize",
-    setupDeviceDetection
+    refreshDeviceSettings
   );
 }
 
