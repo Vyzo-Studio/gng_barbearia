@@ -12,47 +12,30 @@ const summaryPrice = document.getElementById("summary-price");
 const summaryDate = document.getElementById("summary-date");
 const summaryTime = document.getElementById("summary-time");
 
-const serviceLinks = Array.from(
-  document.querySelectorAll("[data-service-link]")
-);
+const serviceLinks = Array.from(document.querySelectorAll("[data-service-link]"));
 
 const WHATSAPP_NUMBER = "5561994075539";
-
-const SUPABASE_URL =
-  "https://ueqfokfnjsjgocotvdae.supabase.co";
-
-const SUPABASE_PUBLISHABLE_KEY =
-  "sb_publishable_YqWCSylIzOdQcxuJFpE9dQ_3mVV4oji";
-
-const BUSINESS_TIMEZONE =
-  "America/Sao_Paulo";
-
+const SUPABASE_URL = "https://ueqfokfnjsjgocotvdae.supabase.co";
+const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_YqWCSylIzOdQcxuJFpE9dQ_3mVV4oji";
+const BUSINESS_TIMEZONE = "America/Sao_Paulo";
 const SLOT_START_HOUR = 9;
 const SLOT_START_MINUTE = 0;
-
 const SLOT_END_HOUR = 19;
 const SLOT_END_MINUTE = 30;
-
 const SLOT_INTERVAL = 30;
 const BOOKING_DAYS_COUNT = 7;
 
 let bookingBarber = null;
 let bookingCustomerName = null;
 let bookingCustomerPhone = null;
-
 let summaryBarber = null;
 let summaryCustomer = null;
-
 let barbers = [];
-
 let selectedBarberId = null;
 let selectedBarberName = "";
-
 let selectedDate = null;
 let selectedTime = null;
-
 let blockedSlots = new Map();
-
 let bookingRequestInProgress = false;
 
 if (year) {
@@ -60,178 +43,100 @@ if (year) {
 }
 
 function closeMenu() {
-  if (!menuToggle || !mainNav) {
-    return;
-  }
+  if (!menuToggle || !mainNav) return;
 
   mainNav.classList.remove("is-open");
   menuToggle.classList.remove("is-active");
 
-  menuToggle.setAttribute(
-    "aria-expanded",
-    "false"
-  );
+  menuToggle.setAttribute("aria-expanded", "false");
+  menuToggle.setAttribute("aria-label", "Abrir menu");
 
-  menuToggle.setAttribute(
-    "aria-label",
-    "Abrir menu"
-  );
-
-  document.body.classList.remove(
-    "menu-open"
-  );
+  document.body.classList.remove("menu-open");
 }
 
 function openMenu() {
-  if (!menuToggle || !mainNav) {
-    return;
-  }
+  if (!menuToggle || !mainNav) return;
 
   mainNav.classList.add("is-open");
   menuToggle.classList.add("is-active");
 
-  menuToggle.setAttribute(
-    "aria-expanded",
-    "true"
-  );
+  menuToggle.setAttribute("aria-expanded", "true");
+  menuToggle.setAttribute("aria-label", "Fechar menu");
 
-  menuToggle.setAttribute(
-    "aria-label",
-    "Fechar menu"
-  );
-
-  document.body.classList.add(
-    "menu-open"
-  );
+  document.body.classList.add("menu-open");
 }
 
 function setupMenu() {
-  if (!menuToggle || !mainNav) {
-    return;
-  }
+  if (!menuToggle || !mainNav) return;
 
-  menuToggle.addEventListener(
-    "click",
-    function () {
-      if (
-        mainNav.classList.contains(
-          "is-open"
-        )
-      ) {
-        closeMenu();
-      } else {
-        openMenu();
-      }
+  menuToggle.addEventListener("click", function () {
+    if (mainNav.classList.contains("is-open")) {
+      closeMenu();
+    } else {
+      openMenu();
     }
-  );
+  });
 
-  mainNav
-    .querySelectorAll('a[href^="#"]')
-    .forEach(function (link) {
-      link.addEventListener(
-        "click",
-        closeMenu
-      );
-    });
+  mainNav.querySelectorAll('a[href^="#"]').forEach(function (link) {
+    link.addEventListener("click", closeMenu);
+  });
 
-  document.addEventListener(
-    "click",
-    function (event) {
-      if (
-        !mainNav.classList.contains(
-          "is-open"
-        )
-      ) {
-        return;
-      }
+  document.addEventListener("click", function (event) {
+    if (!mainNav.classList.contains("is-open")) return;
 
-      if (
-        mainNav.contains(event.target) ||
-        menuToggle.contains(event.target)
-      ) {
-        return;
-      }
+    if (
+      mainNav.contains(event.target) ||
+      menuToggle.contains(event.target)
+    ) {
+      return;
+    }
 
+    closeMenu();
+  });
+
+  document.addEventListener("keydown", function (event) {
+    if (event.key === "Escape") {
       closeMenu();
     }
-  );
+  });
 
-  document.addEventListener(
-    "keydown",
-    function (event) {
-      if (event.key === "Escape") {
-        closeMenu();
-      }
+  window.addEventListener("resize", function () {
+    if (window.innerWidth > 860) {
+      closeMenu();
     }
-  );
-
-  window.addEventListener(
-    "resize",
-    function () {
-      if (window.innerWidth > 860) {
-        closeMenu();
-      }
-    }
-  );
+  });
 }
 
 function getBusinessDateParts() {
-  const formatter =
-    new Intl.DateTimeFormat(
-      "en-CA",
-      {
-        timeZone:
-          BUSINESS_TIMEZONE,
-        year:
-          "numeric",
-        month:
-          "2-digit",
-        day:
-          "2-digit",
-        hour:
-          "2-digit",
-        minute:
-          "2-digit",
-        hourCycle:
-          "h23"
-      }
-    );
+  const formatter = new Intl.DateTimeFormat("en-CA", {
+    timeZone: BUSINESS_TIMEZONE,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    hourCycle: "h23"
+  });
 
   const result = {};
 
-  formatter
-    .formatToParts(new Date())
-    .forEach(function (part) {
-      if (
-        part.type !==
-        "literal"
-      ) {
-        result[part.type] =
-          part.value;
-      }
-    });
+  formatter.formatToParts(new Date()).forEach(function (part) {
+    if (part.type !== "literal") {
+      result[part.type] = part.value;
+    }
+  });
 
   return {
-    year:
-      Number(result.year),
-
-    month:
-      Number(result.month),
-
-    day:
-      Number(result.day),
-
-    hour:
-      Number(result.hour),
-
-    minute:
-      Number(result.minute)
+    year: Number(result.year),
+    month: Number(result.month),
+    day: Number(result.day),
+    hour: Number(result.hour),
+    minute: Number(result.minute)
   };
 }
 
 function padNumber(value) {
-  return String(value)
-    .padStart(2, "0");
+  return String(value).padStart(2, "0");
 }
 
 function buildDateKey(
@@ -269,10 +174,7 @@ function addDays(
   date,
   amount
 ) {
-  const result =
-    new Date(
-      date.getTime()
-    );
+  const result = new Date(date.getTime());
 
   result.setUTCDate(
     result.getUTCDate() +
@@ -294,10 +196,8 @@ function formatWeekday(date) {
   return new Intl.DateTimeFormat(
     "pt-BR",
     {
-      weekday:
-        "short",
-      timeZone:
-        "UTC"
+      weekday: "short",
+      timeZone: "UTC"
     }
   )
     .format(date)
@@ -308,10 +208,8 @@ function formatMonth(date) {
   return new Intl.DateTimeFormat(
     "pt-BR",
     {
-      month:
-        "short",
-      timeZone:
-        "UTC"
+      month: "short",
+      timeZone: "UTC"
     }
   )
     .format(date)
@@ -322,24 +220,17 @@ function formatFullDate(date) {
   return new Intl.DateTimeFormat(
     "pt-BR",
     {
-      weekday:
-        "long",
-      day:
-        "2-digit",
-      month:
-        "long",
-      year:
-        "numeric",
-      timeZone:
-        "UTC"
+      weekday: "long",
+      day: "2-digit",
+      month: "long",
+      year: "numeric",
+      timeZone: "UTC"
     }
   ).format(date);
 }
 
 function capitalizeFirst(value) {
-  if (!value) {
-    return "";
-  }
+  if (!value) return "";
 
   return (
     value.charAt(0).toUpperCase() +
@@ -348,8 +239,7 @@ function capitalizeFirst(value) {
 }
 
 function getTodayDate() {
-  const now =
-    getBusinessDateParts();
+  const now = getBusinessDateParts();
 
   return createUtcDate(
     now.year,
@@ -359,8 +249,7 @@ function getTodayDate() {
 }
 
 function getTodayKey() {
-  const now =
-    getBusinessDateParts();
+  const now = getBusinessDateParts();
 
   return buildDateKey(
     now.year,
@@ -370,8 +259,7 @@ function getTodayKey() {
 }
 
 function getCurrentMinutes() {
-  const now =
-    getBusinessDateParts();
+  const now = getBusinessDateParts();
 
   return (
     now.hour * 60 +
@@ -380,27 +268,20 @@ function getCurrentMinutes() {
 }
 
 function timeToMinutes(time) {
-  if (!time) {
-    return 0;
-  }
+  if (!time) return 0;
 
-  const parts =
-    String(time).split(":");
+  const parts = String(time).split(":");
 
   return (
-    Number(parts[0]) *
-      60 +
+    Number(parts[0]) * 60 +
     Number(parts[1])
   );
 }
 
 function normalizeDatabaseTime(time) {
-  if (!time) {
-    return "";
-  }
+  if (!time) return "";
 
-  return String(time)
-    .slice(0, 5);
+  return String(time).slice(0, 5);
 }
 
 function generateSlots() {
@@ -420,9 +301,7 @@ function generateSlots() {
     minutes += SLOT_INTERVAL
   ) {
     const hour =
-      Math.floor(
-        minutes / 60
-      );
+      Math.floor(minutes / 60);
 
     const minute =
       minutes % 60;
@@ -432,9 +311,7 @@ function generateSlots() {
         padNumber(hour) +
         ":" +
         padNumber(minute),
-
-      minutes:
-        minutes
+      minutes
     });
   }
 
@@ -451,10 +328,9 @@ function digitsOnly(value) {
 }
 
 function isValidName(value) {
-  const name =
-    String(
-      value || ""
-    ).trim();
+  const name = String(
+    value || ""
+  ).trim();
 
   return (
     name.length >= 2 &&
@@ -463,8 +339,7 @@ function isValidName(value) {
 }
 
 function isValidPhone(value) {
-  const digits =
-    digitsOnly(value);
+  const digits = digitsOnly(value);
 
   return (
     digits.length >= 10 &&
@@ -477,15 +352,11 @@ function formatPhoneInput(value) {
     digitsOnly(value)
       .slice(0, 11);
 
-  if (
-    digits.length <= 2
-  ) {
+  if (digits.length <= 2) {
     return digits;
   }
 
-  if (
-    digits.length <= 6
-  ) {
+  if (digits.length <= 6) {
     return (
       "(" +
       digits.slice(0, 2) +
@@ -494,9 +365,7 @@ function formatPhoneInput(value) {
     );
   }
 
-  if (
-    digits.length <= 10
-  ) {
+  if (digits.length <= 10) {
     return (
       "(" +
       digits.slice(0, 2) +
@@ -521,33 +390,29 @@ async function supabaseRpc(
   functionName,
   payload = {}
 ) {
-  const response =
-    await fetch(
-      SUPABASE_URL +
-      "/rest/v1/rpc/" +
-      functionName,
-      {
-        method:
-          "POST",
+  const response = await fetch(
+    SUPABASE_URL +
+    "/rest/v1/rpc/" +
+    functionName,
+    {
+      method: "POST",
 
-        headers: {
-          "Content-Type":
-            "application/json",
+      headers: {
+        "Content-Type":
+          "application/json",
 
-          apikey:
-            SUPABASE_PUBLISHABLE_KEY,
+        apikey:
+          SUPABASE_PUBLISHABLE_KEY,
 
-          Authorization:
-            "Bearer " +
-            SUPABASE_PUBLISHABLE_KEY
-        },
+        Authorization:
+          "Bearer " +
+          SUPABASE_PUBLISHABLE_KEY
+      },
 
-        body:
-          JSON.stringify(
-            payload
-          )
-      }
-    );
+      body:
+        JSON.stringify(payload)
+    }
+  );
 
   const contentType =
     response.headers.get(
@@ -582,9 +447,7 @@ async function supabaseRpc(
         data.message;
     }
 
-    throw new Error(
-      message
-    );
+    throw new Error(message);
   }
 
   return data;
@@ -679,16 +542,13 @@ function injectBookingStyles() {
     }
 
     .booking-time-status {
-      width: 24px;
-      height: 24px;
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      border-radius: 50%;
-      background: #9b3941;
-      color: #fff;
-      font-size: .76rem;
-      font-weight: 800;
+      color: #7d8794;
+      background: transparent;
+      font-size: 1rem;
+      font-weight: 900;
       line-height: 1;
       text-decoration: none;
     }
@@ -700,9 +560,7 @@ function injectBookingStyles() {
     }
   `;
 
-  document.head.appendChild(
-    style
-  );
+  document.head.appendChild(style);
 }
 
 function createBarberStep() {
@@ -953,22 +811,19 @@ function createCustomerStep(
 }
 
 function createBarberSummary() {
-  if (
+  const existing =
     document.getElementById(
       "summary-barber"
-    )
-  ) {
+    );
+
+  if (existing) {
     summaryBarber =
-      document.getElementById(
-        "summary-barber"
-      );
+      existing;
 
     return;
   }
 
-  if (!summaryDate) {
-    return;
-  }
+  if (!summaryDate) return;
 
   const dateRow =
     summaryDate.parentElement;
@@ -985,11 +840,15 @@ function createBarberSummary() {
       "div"
     );
 
-  barberRow.innerHTML =
-    '<span>Barbeiro</span>' +
-    '<strong id="summary-barber">' +
-    "Não selecionado" +
-    "</strong>";
+  barberRow.innerHTML = `
+    <span>
+      Barbeiro
+    </span>
+
+    <strong id="summary-barber">
+      Não selecionado
+    </strong>
+  `;
 
   dateRow.parentElement.insertBefore(
     barberRow,
@@ -1003,15 +862,14 @@ function createBarberSummary() {
 }
 
 function createCustomerSummary() {
-  if (
+  const existing =
     document.getElementById(
       "summary-customer"
-    )
-  ) {
+    );
+
+  if (existing) {
     summaryCustomer =
-      document.getElementById(
-        "summary-customer"
-      );
+      existing;
 
     return;
   }
@@ -1019,8 +877,7 @@ function createCustomerSummary() {
   if (
     !summaryService ||
     !summaryService.parentElement ||
-    !summaryService.parentElement
-      .parentElement
+    !summaryService.parentElement.parentElement
   ) {
     return;
   }
@@ -1030,19 +887,20 @@ function createCustomerSummary() {
       "div"
     );
 
-  customerRow.innerHTML =
-    '<span>Cliente</span>' +
-    '<strong id="summary-customer">' +
-    "Não informado" +
-    "</strong>";
+  customerRow.innerHTML = `
+    <span>
+      Cliente
+    </span>
 
-  summaryService
-    .parentElement
-    .parentElement
-    .insertBefore(
-      customerRow,
-      summaryService.parentElement
-    );
+    <strong id="summary-customer">
+      Não informado
+    </strong>
+  `;
+
+  summaryService.parentElement.parentElement.insertBefore(
+    customerRow,
+    summaryService.parentElement
+  );
 
   summaryCustomer =
     document.getElementById(
@@ -1051,9 +909,7 @@ function createCustomerSummary() {
 }
 
 async function loadBarbers() {
-  if (!bookingBarber) {
-    return;
-  }
+  if (!bookingBarber) return;
 
   try {
     const data =
@@ -1146,25 +1002,19 @@ function getSelectedBarber() {
 }
 
 function updateBarberSummary() {
-  if (!summaryBarber) {
-    return;
+  if (summaryBarber) {
+    summaryBarber.textContent =
+      selectedBarberName ||
+      "Não selecionado";
   }
-
-  summaryBarber.textContent =
-    selectedBarberName ||
-    "Não selecionado";
 }
 
 function updateCustomerSummary() {
-  if (!summaryCustomer) {
-    return;
-  }
+  if (!summaryCustomer) return;
 
   const name =
     bookingCustomerName
-      ? bookingCustomerName
-          .value
-          .trim()
+      ? bookingCustomerName.value.trim()
       : "";
 
   summaryCustomer.textContent =
@@ -1348,13 +1198,15 @@ async function loadBookedSlots() {
           selectedTime
         )
       ) {
-        selectedTime = null;
+        selectedTime =
+          null;
 
         updateTimeSummary();
       }
     }
 
     updateSubmitState();
+
   } catch (error) {
     console.error(
       "Erro ao carregar horários ocupados:",
@@ -1370,9 +1222,7 @@ async function loadBookedSlots() {
 }
 
 function updateServiceSummary() {
-  if (!bookingService) {
-    return;
-  }
+  if (!bookingService) return;
 
   const option =
     bookingService.options[
@@ -1403,9 +1253,7 @@ function updateServiceSummary() {
 }
 
 function updateDateSummary(date) {
-  if (!summaryDate) {
-    return;
-  }
+  if (!summaryDate) return;
 
   summaryDate.textContent =
     date
@@ -1416,13 +1264,11 @@ function updateDateSummary(date) {
 }
 
 function updateTimeSummary() {
-  if (!summaryTime) {
-    return;
+  if (summaryTime) {
+    summaryTime.textContent =
+      selectedTime ||
+      "Não selecionado";
   }
-
-  summaryTime.textContent =
-    selectedTime ||
-    "Não selecionado";
 }
 
 function updateSubmitState() {
@@ -1475,9 +1321,7 @@ function updateSubmitState() {
 }
 
 function renderDays() {
-  if (!bookingDays) {
-    return;
-  }
+  if (!bookingDays) return;
 
   if (
     !bookingService ||
@@ -1553,7 +1397,8 @@ function renderDays() {
       "</small>";
 
     if (
-      dateKey === todayKey
+      dateKey ===
+      todayKey
     ) {
       button.classList.add(
         "is-today"
@@ -1585,8 +1430,12 @@ function renderDays() {
     button.addEventListener(
       "click",
       function () {
-        if (!button.disabled) {
-          selectDate(date);
+        if (
+          !button.disabled
+        ) {
+          selectDate(
+            date
+          );
         }
       }
     );
@@ -1687,9 +1536,7 @@ function selectDate(date) {
 }
 
 function renderTimes() {
-  if (!bookingTimes) {
-    return;
-  }
+  if (!bookingTimes) return;
 
   if (
     !bookingService ||
@@ -1768,7 +1615,7 @@ function renderTimes() {
           '<span class="booking-time-value">' +
           slot.value +
           "</span>" +
-          '<span class="booking-time-status">✕</span>';
+          '<span class="booking-time-status">X</span>';
 
         button.disabled =
           true;
@@ -1907,9 +1754,7 @@ function selectTime(
 }
 
 async function handleBarberChange() {
-  if (!bookingBarber) {
-    return;
-  }
+  if (!bookingBarber) return;
 
   selectedBarberId =
     bookingBarber.value ||
@@ -2057,9 +1902,7 @@ function selectServiceFromLink(
       service
     );
 
-  if (!option) {
-    return;
-  }
+  if (!option) return;
 
   bookingService.value =
     service;
@@ -2089,6 +1932,7 @@ function setupServiceLinks() {
 
 function buildWhatsappMessage() {
   if (
+    !bookingService ||
     !bookingService.value ||
     !selectedBarberName ||
     !selectedDate ||
@@ -2098,17 +1942,17 @@ function buildWhatsappMessage() {
     return "";
   }
 
+  const customerName =
+    bookingCustomerName
+      .value
+      .trim();
+
   const dateText =
     capitalizeFirst(
       formatFullDate(
         selectedDate
       )
     );
-
-  const customerName =
-    bookingCustomerName
-      .value
-      .trim();
 
   return (
     "Olá, GNG Barbearia!\n\n" +
@@ -2133,13 +1977,15 @@ function buildWhatsappMessage() {
   );
 }
 
-function buildWhatsappUrl() {
+function buildWhatsappUrlFromMessage(
+  message
+) {
   return (
     "https://wa.me/" +
     WHATSAPP_NUMBER +
     "?text=" +
     encodeURIComponent(
-      buildWhatsappMessage()
+      message
     )
   );
 }
@@ -2171,14 +2017,14 @@ function prepareWhatsappWindow() {
 }
 
 function sendWhatsappToWindow(
-  preparedWindow
+  preparedWindow,
+  whatsappUrl
 ) {
-  const url =
-    buildWhatsappUrl();
+  if (!whatsappUrl) return;
 
   if (preparedWindow) {
     preparedWindow.location.href =
-      url;
+      whatsappUrl;
 
     try {
       preparedWindow.focus();
@@ -2195,7 +2041,7 @@ function sendWhatsappToWindow(
     );
 
   link.href =
-    url;
+    whatsappUrl;
 
   link.target =
     "_blank";
@@ -2264,6 +2110,22 @@ async function submitBooking() {
     return;
   }
 
+  const whatsappMessage =
+    buildWhatsappMessage();
+
+  if (!whatsappMessage) {
+    alert(
+      "Não foi possível montar a mensagem do WhatsApp. Revise os dados e tente novamente."
+    );
+
+    return;
+  }
+
+  const whatsappUrl =
+    buildWhatsappUrlFromMessage(
+      whatsappMessage
+    );
+
   const whatsappWindow =
     prepareWhatsappWindow();
 
@@ -2309,11 +2171,12 @@ async function submitBooking() {
       }
     );
 
-    await loadBookedSlots();
-
     sendWhatsappToWindow(
-      whatsappWindow
+      whatsappWindow,
+      whatsappUrl
     );
+
+    await loadBookedSlots();
 
     selectedTime =
       null;
